@@ -23,7 +23,7 @@ describe('App', () => {
     expect(h1?.textContent).toContain('João Xavier');
   });
 
-  it('tem todas as seções do menu', async () => {
+  it('tem todas as seções como apps do desktop', async () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     TestBed.inject(HttpTestingController)
@@ -31,7 +31,7 @@ describe('App', () => {
       .forEach((req) => req.flush([]));
     await fixture.whenStable();
     const root = fixture.nativeElement as HTMLElement;
-    for (const id of ['links', 'projetos', 'experiencia', 'formacao', 'contato']) {
+    for (const id of ['sobre', 'projetos', 'experiencia', 'formacao', 'contato']) {
       expect(root.querySelector(`#${id}`), id).not.toBeNull();
     }
   });

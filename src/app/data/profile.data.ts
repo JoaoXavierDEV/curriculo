@@ -144,33 +144,6 @@ export const LINKS = {
   },
 } as const satisfies Record<string, SocialLink>;
 
-/** Ordem dos botões no linktree. Âncoras internas vêm primeiro, como "highlights". */
-export const LINKTREE: readonly SocialLink[] = [
-  {
-    id: 'projetos',
-    tag: '>_',
-    label: 'Projetos finalizados',
-    handle: 'direto do GitHub',
-    href: '#projetos',
-    external: false,
-  },
-  LINKS.github,
-  LINKS.linkedin,
-  LINKS.instagram,
-  LINKS.heavycode,
-  LINKS.salome,
-  LINKS.youtube,
-  LINKS.twitch,
-  {
-    id: 'contato',
-    tag: '!',
-    label: 'Entrar em contato',
-    handle: 'e-mail ou WhatsApp',
-    href: '#contato',
-    external: false,
-  },
-];
-
 export const SOCIALS: readonly SocialLink[] = [
   LINKS.github,
   LINKS.linkedin,

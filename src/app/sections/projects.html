@@ -9,7 +9,7 @@
   <div aria-live="polite" [attr.aria-busy]="loading()">
     @if (loading()) {
       <p class="sr-only">Carregando projetos do GitHub…</p>
-      <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
+      <ul class="grid gap-6 @xl:grid-cols-2 @4xl:grid-cols-3" aria-hidden="true">
         @for (item of skeletons; track item) {
           <li class="frame skeleton">
             <span class="skeleton-line w-2/3"></span>
@@ -20,7 +20,7 @@
         }
       </ul>
     } @else {
-      <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <ul class="grid gap-6 @xl:grid-cols-2 @4xl:grid-cols-3">
         @for (repo of repos(); track repo.name; let i = $index) {
           <li class="frame repo" [appReveal]="i % 3">
             <span class="frame-label" aria-hidden="true">./{{ repo.name.toLowerCase() }}</span>

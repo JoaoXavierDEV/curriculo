@@ -23,7 +23,7 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --header-h: 3.5rem;
-  --statusbar-h: 1.75rem;
+  --taskbar-h: 2.25rem;
 
   /* Tintas do asciify-engine derivadas dos tokens (ver skill applying-asciify). */
   --ascii-ink: color-mix(in oklab, var(--color-phosphor-dim) 55%, var(--color-ground));
@@ -55,7 +55,29 @@ body {
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   text-rendering: optimizeLegibility;
-  padding-bottom: calc(var(--statusbar-h) + env(safe-area-inset-bottom));
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* As seções viram conteúdo de janela/app: menos respiro que numa página. */
+app-content .section {
+  max-width: none;
+  margin: 0;
+  padding: 1.5rem 1.5rem 2.5rem;
+}
+
+@media (min-width: 768px) {
+  app-content .section {
+    padding: 1.75rem 2rem 2.5rem;
+  }
+}
+
+app-content app-section-heading {
+  margin-bottom: 1.75rem !important;
+}
+
+app-content .section-title {
+  font-size: clamp(2rem, 1.6rem + 2cqi, 2.8rem);
 }
 
 ::selection {
@@ -305,24 +327,6 @@ body {
     to {
       clip-path: inset(0 0 0 0);
     }
-  }
-
-  /* ── Monitor CRT ligado: fósforo e aberração cromática nos títulos ─────── */
-  [data-crt='on'] .section-title,
-  [data-crt='on'] .side-title {
-    text-shadow:
-      -1.5px 0 0 rgb(255 60 110 / 0.35),
-      1.5px 0 0 rgb(60 220 255 / 0.35),
-      0 0 18px rgb(92 240 143 / 0.25);
-  }
-
-  [data-crt='on'] .text-phosphor,
-  [data-crt='on'] .prompt::before {
-    text-shadow: 0 0 8px rgb(92 240 143 / 0.55);
-  }
-
-  [data-crt='on'] .btn-primary {
-    box-shadow: 0 0 18px rgb(92 240 143 / 0.28);
   }
 
   @media (prefers-reduced-motion: reduce) {

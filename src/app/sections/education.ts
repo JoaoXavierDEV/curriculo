@@ -14,7 +14,7 @@ import { SectionHeading } from '../ui/section-heading';
         headingId="formacao-title"
       />
 
-      <ul class="grid gap-6 md:grid-cols-3">
+      <ul class="grid gap-6 @3xl:grid-cols-3">
         @for (item of items; track item.file; let i = $index) {
           <li class="frame frame-corners edu" [appReveal]="i">
             <span class="frame-label" aria-hidden="true">{{ item.file }}</span>

@@ -1,0 +1,66 @@
+<div class="statusbar" aria-hidden="true">
+  <span>{{ clock() }}</span>
+  <span class="status-icons">▂▄▆█ 5G <span class="battery">[▮▮▮▯]</span> 87%</span>
+</div>
+
+<main class="home" id="conteudo" [inert]="wm.phoneApp() !== null">
+  <div class="wallpaper" aria-hidden="true"></div>
+  <h1 class="sr-only">João Xavier, Dev Full Stack .NET + Angular</h1>
+
+  <section class="widget" aria-label="Resumo">
+    <p class="widget-clock" aria-hidden="true">{{ clock() }}</p>
+    <p class="widget-date">{{ date() }}</p>
+    <p class="widget-name">{{ profile.name }}</p>
+    <p class="widget-role">{{ profile.role }} · RJ</p>
+    <button type="button" class="search" (click)="openAbout()">
+      <span class="text-phosphor" aria-hidden="true">$</span> whoami
+      <span class="search-cursor" aria-hidden="true"></span>
+      <span class="sr-only">: abrir sobre mim</span>
+    </button>
+  </section>
+
+  <nav class="apps" aria-label="Apps">
+    <ul>
+      @for (icon of icons; track icon.id) {
+        <li [attr.data-app-icon]="icon.id">
+          <app-os-icon class="phone" [icon]="icon" (opened)="open(icon, $event)" />
+        </li>
+      }
+    </ul>
+  </nav>
+</main>
+
+@for (app of apps; track app.id) {
+  <section
+    class="screen"
+    [id]="'tela-' + app.id"
+    role="dialog"
+    [attr.aria-labelledby]="'tela-' + app.id + '-title'"
+    [attr.data-state]="wm.phoneApp() === app.id ? 'open' : 'closed'"
+    [inert]="wm.phoneApp() !== app.id"
+    [style.transform-origin]="origin()"
+  >
+    <header class="appbar">
+      <button type="button" class="back" (click)="wm.phoneBack()">
+        <span aria-hidden="true">←</span> voltar
+      </button>
+      <span class="appbar-title" [id]="'tela-' + app.id + '-title'">{{ app.label }}</span>
+      <span class="appbar-file" aria-hidden="true">{{ app.file }}</span>
+    </header>
+    <div class="screen-body">
+      <app-content [app]="app.id" />
+    </div>
+  </section>
+}
+
+<nav class="navbar" aria-label="Navegação do sistema">
+  <button
+    type="button"
+    (click)="wm.phoneBack()"
+    [disabled]="wm.phoneApp() === null"
+    aria-label="Voltar"
+  >
+    ◁
+  </button>
+  <button type="button" (click)="home()" aria-label="Tela inicial">○</button>
+</nav>

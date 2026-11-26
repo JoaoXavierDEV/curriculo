@@ -2,10 +2,11 @@
 
 Meu site pessoal: links, projetos finalizados do GitHub, experiência e formação, com cara de terminal e arte ASCII.
 
-- **Stack:** Angular 22 (standalone, signals, zoneless), Tailwind 4, [asciify-engine](https://asciify.org) para o fundo do hero, os títulos e o wordmark do rodapé.
+- **Desktop (≥ 768 px):** uma área de trabalho de terminal. Cada link é um ícone: seções (sobre, projetos, experiência, formação, contato) abrem janelas que dá para arrastar, minimizar, maximizar e fechar; redes e sites abrem direto em nova aba. A barra de baixo é a taskbar.
+- **Celular:** home no estilo Android com apps em tela cheia, "voltar" no topo e integração com o voltar do sistema. Links diretos como `joaoxavier.dev/#projetos` abrem a seção.
+- **Stack:** Angular 22 (standalone, signals, zoneless), Tailwind 4, [asciify-engine](https://asciify.org) para o papel de parede ASCII e os títulos.
 - **Projetos:** vêm ao vivo da API do GitHub. Aparecem os repositórios com a topic `finalizado`; sem nenhum, uma lista curada; se a API falhar, um snapshot em `src/app/data/repos.fallback.ts`.
-- **Dados pessoais:** tudo em `src/app/data/profile.data.ts`.
-- **Arte ASCII:** o banner do nome (FIGlet) e o retrato (asciify-engine) são gerados por `npm run ascii` e salvos em `src/app/data/ascii-art.ts`.
+- **Dados:** `src/app/data/profile.data.ts` (textos e links) e `src/app/data/apps.ts` (ícones e janelas).
 
 ## Rodar
 

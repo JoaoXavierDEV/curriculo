@@ -14,7 +14,7 @@ import { SectionHeading } from '../ui/section-heading';
         lede="Proposta, freela, dúvida, meme bom: pode mandar. Respondo mais rápido no WhatsApp."
       />
 
-      <div class="grid gap-4 sm:grid-cols-2">
+      <div class="grid gap-4 @lg:grid-cols-2">
         <a class="contact" [href]="links.email.href">
           <span class="contact-kicker">e-mail</span>
           <span class="contact-value">{{ profile.email }}</span>
