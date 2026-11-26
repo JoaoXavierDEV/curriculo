@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { WindowManager } from '../services/window-manager.service';
 
 /**
@@ -45,19 +45,12 @@ import { WindowManager } from '../services/window-manager.service';
             width="320"
             height="320"
             alt="Gato malhado girando a cabeça (o meme oiia)"
-            [class.raw]="!keyed()"
           />
         }
         <figcaption>
-          <span class="text-phosphor" aria-hidden="true">●</span> cat.gif · 1,5 MB · fundo verde
-          removido por CSS
+          <span class="text-phosphor" aria-hidden="true">●</span> cat.gif · 1,5 MB
         </figcaption>
       </figure>
-
-      <label class="toggle">
-        <input type="checkbox" [checked]="keyed()" (change)="keyed.set(!keyed())" />
-        <span>remover fundo verde (chroma key)</span>
-      </label>
     </section>
   `,
   styles: `
@@ -86,34 +79,16 @@ import { WindowManager } from '../services/window-manager.service';
       margin-inline: auto;
       filter: url('#chroma-key');
     }
-    .cat img.raw {
-      filter: none;
-    }
     figcaption {
       margin-top: 0.75rem;
       font-size: 0.72rem;
       color: var(--color-muted);
-    }
-    .toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      min-height: 2.75rem;
-      margin-top: 0.5rem;
-      font-size: 0.8rem;
-      cursor: pointer;
-    }
-    .toggle input {
-      width: 1rem;
-      height: 1rem;
-      accent-color: var(--color-phosphor);
     }
   `,
 })
 export class Trash {
   private readonly wm = inject(WindowManager);
 
-  protected readonly keyed = signal(true);
   protected readonly opened = computed(
     () => this.wm.state('lixeira').open || this.wm.phoneApp() === 'lixeira',
   );
