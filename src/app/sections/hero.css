@@ -58,6 +58,7 @@
 }
 
 .banner {
+  position: relative;
   font-size: min(calc(100cqi / 44 / 0.6), 1.05rem);
   line-height: 1;
   color: var(--color-phosphor);
@@ -79,31 +80,53 @@
   text-wrap: pretty;
 }
 
-.portrait {
-  justify-self: center;
-  width: min(100%, 26rem);
-  margin: 0;
-  padding: 1.6rem 1.25rem 1rem;
-  background: color-mix(in oklab, var(--color-surface) 88%, transparent);
+/* Glitch de sinal a cada ~7 s: fatias do banner saltam em vermelho e ciano. */
+:host-context([data-crt='on']) .banner::before,
+:host-context([data-crt='on']) .banner::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  text-shadow: none;
+  opacity: 0;
+  animation: glitch 7s steps(1) 2s infinite;
 }
 
-.portrait-wrap {
-  container-type: inline-size;
+:host-context([data-crt='on']) .banner::before {
+  color: rgb(255 60 110 / 0.75);
 }
 
-.portrait-art {
-  font-size: min(calc(100cqi / 42 / 0.6), 0.82rem);
-  line-height: 1.12;
-  color: color-mix(in oklab, var(--color-phosphor) 82%, var(--color-fg));
-  animation: print 900ms steps(29, end) 220ms both;
+:host-context([data-crt='on']) .banner::after {
+  color: rgb(60 220 255 / 0.75);
+  animation-delay: 2.04s;
 }
 
-.portrait-caption {
-  margin-top: 0.9rem;
-  padding-top: 0.6rem;
-  border-top: 1px dashed var(--color-line);
-  font-size: 0.75rem;
-  color: var(--color-muted);
+@keyframes glitch {
+  0%,
+  92%,
+  100% {
+    opacity: 0;
+    transform: none;
+    clip-path: inset(0 0 100% 0);
+  }
+  93% {
+    opacity: 1;
+    transform: translateX(-4px);
+    clip-path: inset(8% 0 62% 0);
+  }
+  94% {
+    opacity: 1;
+    transform: translateX(3px);
+    clip-path: inset(52% 0 22% 0);
+  }
+  95% {
+    opacity: 1;
+    transform: translateX(-2px);
+    clip-path: inset(30% 0 48% 0);
+  }
+  96% {
+    opacity: 0;
+  }
 }
 
 /* "Impressão" linha a linha, como um terminal desenhando a saída. */
@@ -118,7 +141,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .banner,
-  .portrait-art {
+  :host-context([data-crt='on']) .banner::before,
+  :host-context([data-crt='on']) .banner::after {
     animation: none;
   }
 }

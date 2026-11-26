@@ -1,4 +1,12 @@
-import { Component } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  afterNextRender,
+  inject,
+  viewChild,
+} from '@angular/core';
+import { loadAsciiKit } from '../ui/ascii-kit';
 import { LINKTREE } from '../data/profile.data';
 import { RevealDirective } from '../ui/reveal.directive';
 import { SectionHeading } from '../ui/section-heading';
@@ -8,7 +16,7 @@ import { SectionHeading } from '../ui/section-heading';
   imports: [SectionHeading, RevealDirective],
   template: `
     <section class="section" id="links" aria-labelledby="links-title">
-      <div class="mx-auto max-w-xl">
+      <div class="mx-auto max-w-xl" #column>
         <app-section-heading
           command="ls -la ~/links"
           title="Linktree"
@@ -42,6 +50,12 @@ import { SectionHeading } from '../ui/section-heading';
     </section>
   `,
   styles: `
+    :host {
+      position: relative;
+      display: block;
+      isolation: isolate;
+      background: var(--color-ground);
+    }
     .tree-link {
       display: flex;
       align-items: center;
@@ -87,4 +101,36 @@ import { SectionHeading } from '../ui/section-heading';
 })
 export class Linktree {
   protected readonly links = LINKTREE;
+
+  private readonly column = viewChild.required<ElementRef<HTMLElement>>('column');
+
+  constructor() {
+    const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+    let destroy: (() => void) | null = null;
+    let destroyed = false;
+
+    inject(DestroyRef).onDestroy(() => {
+      destroyed = true;
+      destroy?.();
+    });
+
+    // Chuva de caracteres nas laterais; a coluna de links fica limpa.
+    afterNextRender(() => {
+      loadAsciiKit()
+        .then(({ background, cascade }) => {
+          if (destroyed) return;
+          const handle = background(host, {
+            preset: cascade,
+            clear: this.column().nativeElement,
+            ink: '--ascii-ink',
+            opacity: 0.85,
+            cursor: false,
+          });
+          destroy = () => handle.destroy();
+        })
+        .catch(() => {
+          // Seção sem fundo animado.
+        });
+    });
+  }
 }

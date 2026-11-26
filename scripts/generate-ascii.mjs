@@ -1,4 +1,5 @@
 // Gera os assets ASCII estáticos usados no site (banner do nome e retrato).
+// Antes, rode `python -I scripts/prepare-portrait.py` se o avatar mudar.
 // Rodar com: npm run ascii
 // O resultado é commitado em src/app/data/ascii-art.ts, então o build não depende deste script.
 import { execFileSync } from 'node:child_process';
@@ -23,26 +24,23 @@ const last = trimRight(figlet.textSync('XAVIER', { font: 'ANSI Shadow' }));
 const tilde = ' '.repeat(19) + '▄▀▀▄▄▀';
 const banner = `${tilde}\n${first}\n${last}`;
 
-const portrait = trimRight(
-  execFileSync(
-    'npx',
-    [
-      'asciify-engine',
-      'public/avatar.jpg',
-      '-f',
-      'text',
-      '-w',
-      '42',
-      '--cell-aspect',
-      '2.1',
-      '--crop',
-      '0.33,0.03,0.46,0.7',
-      '--contrast',
-      '1.3',
-      '--no-color',
-    ],
-    { encoding: 'utf8', shell: process.platform === 'win32' },
-  ),
+// Retrato: SVG com a cor de cada caractere vinda da imagem tingida.
+execFileSync(
+  'npx',
+  [
+    'asciify-engine',
+    'scripts/portrait-source.png',
+    '-o',
+    'public/portrait.svg',
+    '-w',
+    '96',
+    '--mode',
+    'shape',
+    '--color',
+    '--background',
+    'transparent',
+  ],
+  { stdio: 'inherit', shell: process.platform === 'win32' },
 );
 
 const toLiteral = (text) =>
@@ -52,11 +50,7 @@ const file = `// Arquivo gerado por scripts/generate-ascii.mjs. Não editar à m
 
 /** "JOÃO XAVIER" em FIGlet (fonte ANSI Shadow). */
 export const NAME_BANNER = ${toLiteral(banner)};
-
-/** Retrato do avatar do GitHub convertido com asciify-engine (modo shape). */
-export const PORTRAIT = ${toLiteral(portrait)};
 `;
 
 writeFileSync('src/app/data/ascii-art.ts', file);
 console.log(banner);
-console.log(portrait);

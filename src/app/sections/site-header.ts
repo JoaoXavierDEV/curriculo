@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ScrambleHoverDirective } from '../ui/scramble-hover.directive';
 
 interface NavItem {
   readonly href: string;
@@ -7,6 +8,7 @@ interface NavItem {
 
 @Component({
   selector: 'app-site-header',
+  imports: [ScrambleHoverDirective],
   host: { role: 'banner' },
   template: `
     <a
@@ -25,7 +27,9 @@ interface NavItem {
         <ul class="flex items-center gap-1 text-sm">
           @for (item of items; track item.href) {
             <li>
-              <a class="nav-link" [href]="item.href">{{ item.label }}</a>
+              <a class="nav-link" [href]="item.href"
+                ><span appScrambleHover>{{ item.label }}</span></a
+              >
             </li>
           }
         </ul>

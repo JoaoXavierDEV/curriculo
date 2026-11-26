@@ -1,13 +1,15 @@
 <div class="hero-inner">
   <div class="hero-copy" #copy>
-    <p class="prompt text-sm text-muted">whoami</p>
+    <p class="text-sm text-muted"><span class="prompt" appTypeOnView>whoami</span></p>
 
     <h1 id="hero-title" class="sr-only">{{ profile.name }}, {{ profile.role }}</h1>
     <div class="banner-wrap">
-      <pre class="ascii banner" aria-hidden="true">{{ banner }}</pre>
+      <pre class="ascii banner" aria-hidden="true" [attr.data-text]="banner">{{ banner }}</pre>
     </div>
 
-    <p class="role cursor">{{ profile.role }}</p>
+    <p class="role">
+      <span class="cursor" appTypeOnView style="animation-delay: 700ms">{{ profile.role }}</span>
+    </p>
     <p class="bio">{{ profile.bio }}</p>
     <p class="text-sm text-muted">
       <span aria-hidden="true" class="text-phosphor">@</span> {{ profile.location }} · remoto
@@ -25,17 +27,5 @@
     </ul>
   </div>
 
-  <figure class="portrait frame frame-corners">
-    <span class="frame-label" aria-hidden="true">avatar.jpg | asciify-engine</span>
-    <div class="portrait-wrap">
-      <pre
-        class="ascii portrait-art"
-        role="img"
-        aria-label="Retrato do João Xavier desenhado com caracteres ASCII"
-        >{{ portrait }}</pre>
-    </div>
-    <figcaption class="portrait-caption">
-      <span class="text-phosphor">●</span> online · 42 colunas, 0 pixels
-    </figcaption>
-  </figure>
+  <app-hero-portrait />
 </div>

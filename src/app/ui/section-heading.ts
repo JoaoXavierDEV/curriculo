@@ -1,11 +1,14 @@
 import { Component, input } from '@angular/core';
 import { ScrambleDirective } from './scramble.directive';
+import { TypeOnViewDirective } from './type-on-view.directive';
 
 @Component({
   selector: 'app-section-heading',
-  imports: [ScrambleDirective],
+  imports: [ScrambleDirective, TypeOnViewDirective],
   template: `
-    <p class="section-kicker prompt">{{ command() }}</p>
+    <p class="section-kicker">
+      <span class="prompt" appTypeOnView>{{ command() }}</span>
+    </p>
     <h2 class="section-title" [id]="headingId()">
       <span class="hash" aria-hidden="true">#&nbsp;</span><span appScramble>{{ title() }}</span>
     </h2>

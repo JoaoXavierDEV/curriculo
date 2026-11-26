@@ -6,12 +6,15 @@ import {
   inject,
   viewChild,
 } from '@angular/core';
-import { NAME_BANNER, PORTRAIT } from '../data/ascii-art';
+import { NAME_BANNER } from '../data/ascii-art';
 import { PROFILE } from '../data/profile.data';
 import { loadAsciiKit } from '../ui/ascii-kit';
+import { HeroPortrait } from './hero-portrait';
+import { TypeOnViewDirective } from '../ui/type-on-view.directive';
 
 @Component({
   selector: 'app-hero',
+  imports: [HeroPortrait, TypeOnViewDirective],
   templateUrl: './hero.html',
   styleUrl: './hero.css',
   host: {
@@ -21,7 +24,6 @@ import { loadAsciiKit } from '../ui/ascii-kit';
 export class Hero {
   protected readonly profile = PROFILE;
   protected readonly banner = NAME_BANNER;
-  protected readonly portrait = PORTRAIT;
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly copy = viewChild.required<ElementRef<HTMLElement>>('copy');
