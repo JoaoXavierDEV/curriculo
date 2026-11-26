@@ -59,12 +59,19 @@ export class WindowManager {
 
   open(id: AppId, origin?: { x: number; y: number }, viewport?: { w: number; h: number }): void {
     const current = this.state(id);
-    const size = appById(id).size;
+    const app = appById(id);
     let { x, y } = current;
     if (!current.open && viewport) {
+      // Tamanho real depois do limite da tela (a janela tem max-width/height de 100% − 16px).
+      const w = Math.min(app.size.w, viewport.w - 16);
+      const h = Math.min(app.size.h, viewport.h - 16);
+      if (app.center) {
+        x = Math.round((viewport.w - w) / 2);
+        y = Math.round((viewport.h - h) / 2);
+      }
       // Mantém a janela inteira dentro da área de trabalho.
-      x = Math.max(8, Math.min(x, viewport.w - Math.min(size.w, viewport.w - 16) - 8));
-      y = Math.max(8, Math.min(y, viewport.h - Math.min(size.h, viewport.h - 16) - 8));
+      x = Math.max(8, Math.min(x, viewport.w - w - 8));
+      y = Math.max(8, Math.min(y, viewport.h - h - 8));
     }
     const originCss = origin ? `${origin.x - x}px ${origin.y - y}px` : current.origin;
     this.patch(id, { open: true, minimized: false, z: ++this.zCounter, x, y, origin: originCss });

@@ -3,13 +3,15 @@ import {
   DestroyRef,
   afterNextRender,
   afterRenderEffect,
+  effect,
   inject,
   signal,
 } from '@angular/core';
-import { APPS, AppId, DesktopIcon, ICONS } from '../data/apps';
+import { APPS, AppId, DesktopIcon, PHONE_ICONS } from '../data/apps';
 import { PROFILE } from '../data/profile.data';
+import { SettingsService } from '../services/settings.service';
 import { WindowManager } from '../services/window-manager.service';
-import { loadAsciiKit } from '../ui/ascii-kit';
+import { AsciiKit, loadAsciiKit } from '../ui/ascii-kit';
 import { AppContent } from './app-content';
 import { OsIcon } from './os-icon';
 
@@ -26,7 +28,7 @@ import { OsIcon } from './os-icon';
 })
 export class Phone {
   protected readonly wm = inject(WindowManager);
-  protected readonly icons = ICONS;
+  protected readonly icons = PHONE_ICONS;
   protected readonly apps = APPS;
   protected readonly profile = PROFILE;
 
@@ -81,33 +83,43 @@ export class Phone {
         this.wm.openPhoneApp(linked);
       }
 
-      let wallpaper: { destroy(): void } | null = null;
-      let destroyed = false;
       loadAsciiKit()
-        .then(({ background, drift }) => {
-          if (destroyed) return;
-          const home = document.querySelector<HTMLElement>('app-phone .wallpaper');
-          if (home) {
-            wallpaper = background(home, {
-              preset: drift,
-              ink: '--ascii-ink',
-              cellSize: 12,
-              speed: 0.5,
-              charset: ' .:+*#',
-            });
-          }
-        })
+        .then((loaded) => kit.set(loaded))
         .catch(() => {
           // Papel de parede estático.
         });
 
       destroyRef.onDestroy(() => {
-        destroyed = true;
         clearInterval(timer);
         removeEventListener('popstate', onPop);
         removeEventListener('hashchange', onHash);
-        wallpaper?.destroy();
       });
+    });
+
+    // Papel de parede "matrix" conforme a configuração.
+    const settings = inject(SettingsService);
+    const kit = signal<AsciiKit | null>(null);
+    let wallpaper: ReturnType<AsciiKit['background']> | null = null;
+    destroyRef.onDestroy(() => wallpaper?.destroy());
+    effect(() => {
+      const mode = settings.settings().wallpaper;
+      const asciiKit = kit();
+      const host = document.querySelector<HTMLElement>('app-phone .wallpaper');
+      if (!asciiKit || !host) return;
+      if (mode === 'off') {
+        wallpaper?.destroy();
+        wallpaper = null;
+        return;
+      }
+      const preset = mode === 'rain' ? asciiKit.cascade : asciiKit.drift;
+      if (wallpaper) wallpaper.setPreset(preset);
+      else
+        wallpaper = asciiKit.background(host, {
+          preset,
+          ink: '--ascii-ink',
+          cellSize: 12,
+          speed: 0.5,
+        });
     });
   }
 

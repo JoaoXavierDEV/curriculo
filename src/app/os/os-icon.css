@@ -1,14 +1,24 @@
 :host {
+  --art: 3rem;
   display: block;
+}
+
+:host-context([data-icon-size='s']) {
+  --art: 2.4rem;
+}
+
+:host-context([data-icon-size='l']) {
+  --art: 3.8rem;
 }
 
 .icon {
   display: grid;
   justify-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   width: 100%;
-  padding: 0.55rem 0.25rem 0.5rem;
+  padding: 0.5rem 0.2rem 0.45rem;
   border: 1px solid transparent;
+  border-radius: 3px;
   background: transparent;
   color: var(--color-fg);
   font: inherit;
@@ -22,72 +32,71 @@
     border-color 140ms ease;
 }
 
-.tile {
+.art {
   position: relative;
-  display: grid;
-  place-items: center;
-  width: 3.6rem;
-  height: 3.6rem;
-  border: 1px solid var(--color-line-strong);
-  background: var(--color-surface);
+  display: block;
+  width: var(--art);
+  height: var(--art);
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.6));
   transition: transform 160ms var(--ease-out);
 }
 
-/* Cantos em box-drawing: o quadro vira um "arquivo" de terminal. */
-.tile::before,
-.tile::after {
+.art app-svg-icon {
   position: absolute;
-  font-size: 0.7rem;
-  line-height: 1;
-  color: var(--color-phosphor-dim);
+  inset: 0;
+  width: auto;
+  height: auto;
 }
 
-.tile::before {
-  content: '┌';
-  top: -0.32em;
-  left: -0.28em;
+/* Atalhos: ícone da marca num quadrado arredondado, como um app. */
+.art.tile {
+  border-radius: 22%;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
 }
 
-.tile::after {
-  content: '┘';
-  right: -0.28em;
-  bottom: -0.32em;
+.art.tile app-svg-icon {
+  inset: 20%;
+  border-radius: 14%;
+  overflow: hidden;
 }
 
-.glyph {
-  font-family: var(--font-display);
-  font-size: 1.85rem;
-  line-height: 1;
-  color: var(--color-phosphor);
-  text-shadow: 0 0 10px rgb(92 240 143 / 0.3);
-}
-
-.badge {
+/* Seta de atalho no canto inferior esquerdo. */
+.shortcut {
   position: absolute;
-  right: 0.2rem;
-  bottom: 0.1rem;
+  left: -0.25rem;
+  bottom: -0.25rem;
+  display: grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid #6b7a72;
+  background: #e8efe9;
+  color: #0a0c0b;
   font-size: 0.65rem;
-  color: var(--color-muted);
+  font-weight: 700;
+  line-height: 1;
 }
 
 .label {
   max-width: 100%;
-  padding: 0 0.3rem;
-  font-size: 0.75rem;
+  padding: 0.05rem 0.3rem;
+  font-size: 0.74rem;
   line-height: 1.3;
   text-align: center;
   overflow-wrap: anywhere;
-  text-shadow: 0 1px 2px #000;
+  text-shadow:
+    0 1px 2px #000,
+    0 0 4px #000;
 }
 
-.icon:active .tile {
-  transform: scale(0.95);
+.icon:active .art {
+  transform: scale(0.94);
 }
 
 .icon:focus-visible {
   outline: none;
-  border-color: var(--color-phosphor);
-  background: rgb(92 240 143 / 0.08);
+  border-color: rgb(92 240 143 / 0.6);
+  background: rgb(92 240 143 / 0.12);
 }
 
 .icon:focus-visible .label {
@@ -98,41 +107,44 @@
 
 @media (hover: hover) and (pointer: fine) {
   .icon:hover {
-    background: rgb(92 240 143 / 0.06);
+    background: rgb(92 240 143 / 0.08);
     border-color: rgb(92 240 143 / 0.25);
-  }
-
-  .icon:hover .tile {
-    border-color: var(--color-phosphor-dim);
   }
 }
 
-/* Celular: ícone de launcher, maior, com cantos arredondados. */
+/* Estilo "fósforo": tudo em verde, sem cor de marca. */
+:host-context([data-icon-style='mono']) .art.tile {
+  background: var(--color-surface-2) !important;
+  box-shadow: inset 0 0 0 1px var(--color-phosphor-dim);
+}
+
+:host-context([data-icon-style='mono']) app-svg-icon {
+  filter: grayscale(1) sepia(1) hue-rotate(85deg) saturate(4) brightness(1.05);
+}
+
+/* ── Celular: ícone de launcher, todos em quadrado arredondado ──────────── */
+:host(.phone) {
+  --art: 3.4rem;
+}
+
 :host(.phone) .icon {
-  gap: 0.4rem;
+  gap: 0.35rem;
   padding: 0.25rem 0;
   border: 0;
 }
 
-:host(.phone) .tile {
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 1rem;
-  border-color: var(--color-line-strong);
-  background: linear-gradient(160deg, var(--color-surface-2), var(--color-surface));
+:host(.phone) .art {
+  border-radius: 24%;
+  background: linear-gradient(160deg, #18251f, #101412);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
 }
 
-:host(.phone) .tile::before,
-:host(.phone) .tile::after {
-  content: none;
-}
-
-:host(.phone) .glyph {
-  font-size: 1.75rem;
+:host(.phone) .art app-svg-icon {
+  inset: 18%;
 }
 
 :host(.phone) .label {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
 }
 
 :host(.phone) .icon:focus-visible {
@@ -142,7 +154,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .icon:active .tile {
+  .icon:active .art {
     transform: none;
   }
 }

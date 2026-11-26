@@ -59,6 +59,51 @@ body {
   overscroll-behavior: none;
 }
 
+/* ── Efeito CRT (configurável no Iniciar) ──────────────────────────────── */
+html[data-crt='subtle'] body::after,
+html[data-crt='strong'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, transparent 0 3px, rgb(0 0 0 / 0.1) 3px 4px);
+}
+
+html[data-crt='strong'] body::after {
+  background:
+    radial-gradient(ellipse 120% 100% at 50% 50%, transparent 60%, rgb(0 0 0 / 0.45) 100%),
+    repeating-linear-gradient(to bottom, transparent 0 2px, rgb(0 0 0 / 0.22) 2px 4px);
+}
+
+/* Forte: faixa de refresh descendo devagar. */
+html[data-crt='strong'] body::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 3000;
+  height: 20vh;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, rgb(92 240 143 / 0.04), transparent);
+  animation: crt-band 8s linear infinite;
+}
+
+@keyframes crt-band {
+  from {
+    transform: translateY(-20vh);
+  }
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-crt='strong'] body::before {
+    animation: none;
+    display: none;
+  }
+}
+
 /* As seções viram conteúdo de janela/app: menos respiro que numa página. */
 app-content .section {
   max-width: none;

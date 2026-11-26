@@ -51,14 +51,6 @@
     var(--color-ground);
 }
 
-.wallpaper::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(to bottom, transparent 0 3px, rgb(0 0 0 / 0.12) 3px 4px);
-}
-
 .widget {
   padding: 0.5rem 0.25rem 1.5rem;
 }

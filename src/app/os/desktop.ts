@@ -3,12 +3,15 @@ import {
   DestroyRef,
   ElementRef,
   afterNextRender,
+  effect,
   inject,
+  signal,
   viewChild,
 } from '@angular/core';
-import { APPS, DesktopIcon, ICONS } from '../data/apps';
+import { APPS, AppId, DESKTOP_APPS, DesktopIcon, SHORTCUTS, TRASH } from '../data/apps';
+import { SettingsService } from '../services/settings.service';
 import { WindowManager } from '../services/window-manager.service';
-import { loadAsciiKit } from '../ui/ascii-kit';
+import { AsciiKit, loadAsciiKit } from '../ui/ascii-kit';
 import { AppWindow } from './app-window';
 import { OsIcon } from './os-icon';
 import { Taskbar } from './taskbar';
@@ -19,23 +22,37 @@ import { Taskbar } from './taskbar';
   template: `
     <main class="desktop" #desktop id="conteudo">
       <h1 class="sr-only">João Xavier, Dev Full Stack .NET + Angular</h1>
-      <nav class="icons" aria-label="Área de trabalho">
+
+      <nav class="icons links" aria-label="Atalhos (abrem em nova aba)">
         <ul>
-          @for (icon of icons; track icon.id) {
+          @for (icon of shortcuts; track icon.id) {
             <li [attr.data-app-icon]="icon.id">
-              <app-os-icon [icon]="icon" (opened)="open(icon, $event)" />
+              <app-os-icon [icon]="icon" />
             </li>
           }
         </ul>
       </nav>
 
+      <nav class="icons apps" aria-label="Área de trabalho">
+        <ul>
+          @for (icon of desktopApps; track icon.id) {
+            <li [attr.data-app-icon]="icon.id">
+              <app-os-icon [icon]="icon" (opened)="openFromIcon(icon, $event)" />
+            </li>
+          }
+        </ul>
+        <div class="trash" [attr.data-app-icon]="trash.id">
+          <app-os-icon [icon]="trash" (opened)="openFromIcon(trash, $event)" />
+        </div>
+      </nav>
+
       <p class="wordmark" aria-hidden="true">joaoxavier.dev</p>
 
-      @for (app of apps; track app.id) {
+      @for (app of windows; track app.id) {
         <app-window [app]="app" />
       }
     </main>
-    <app-taskbar />
+    <app-taskbar (opened)="openFromMenu($event)" />
   `,
   styles: `
     :host {
@@ -45,124 +62,152 @@ import { Taskbar } from './taskbar';
       overflow: hidden;
     }
     .desktop {
+      --art: 3rem;
       position: relative;
       isolation: isolate;
       overflow: hidden;
       outline: none;
       background:
-        radial-gradient(70% 60% at 70% 40%, rgb(92 240 143 / 0.05), transparent 70%),
+        radial-gradient(70% 60% at 50% 45%, rgb(92 240 143 / 0.05), transparent 70%),
         var(--color-ground);
     }
-    /* Scanlines bem sutis e estáticas, só no papel de parede. */
-    .desktop::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      pointer-events: none;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent 0 3px,
-        rgb(0 0 0 / 0.12) 3px 4px
-      );
+    :host-context([data-icon-size='s']) .desktop {
+      --art: 2.4rem;
+    }
+    :host-context([data-icon-size='l']) .desktop {
+      --art: 3.8rem;
     }
     .icons {
       position: absolute;
-      inset: 0.75rem auto 0.75rem 0.75rem;
+      top: 0.75rem;
+      bottom: 0.75rem;
       z-index: 1;
     }
     .icons ul {
       display: grid;
       grid-auto-flow: column;
-      grid-template-rows: repeat(auto-fill, 6.4rem);
-      grid-auto-columns: 6.5rem;
-      gap: 0.4rem 0.5rem;
+      grid-template-rows: repeat(auto-fill, calc(var(--art) + 3.1rem));
+      grid-auto-columns: calc(var(--art) + 3.5rem);
+      gap: 0.25rem 0.35rem;
       height: 100%;
       margin: 0;
       padding: 0;
       list-style: none;
     }
+    .links {
+      left: 0.75rem;
+    }
+    /* Seções à direita, de cima para baixo; a lixeira fica no canto de baixo. */
+    .apps {
+      right: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    .apps ul {
+      direction: rtl;
+      flex: 1;
+      min-height: 0;
+      height: auto;
+    }
+    .apps li {
+      direction: ltr;
+    }
+    .trash {
+      width: calc(var(--art) + 3.5rem);
+      margin-bottom: 1.75rem;
+    }
     .wordmark {
       position: absolute;
-      right: 1.5rem;
-      bottom: 1rem;
+      left: 50%;
+      bottom: 0.6rem;
       z-index: 0;
       margin: 0;
+      translate: -50% 0;
       font-family: var(--font-display);
-      font-size: 1.6rem;
+      font-size: 1.3rem;
       color: var(--color-line-strong);
       user-select: none;
     }
   `,
 })
 export class Desktop {
-  protected readonly icons = ICONS;
-  protected readonly apps = APPS;
+  protected readonly shortcuts = SHORTCUTS;
+  protected readonly desktopApps = DESKTOP_APPS;
+  protected readonly trash = TRASH;
+  /** A janela de configurações é só do celular; no desktop elas ficam no Iniciar. */
+  protected readonly windows = APPS.filter((app) => app.id !== 'config');
 
   private readonly wm = inject(WindowManager);
+  private readonly settings = inject(SettingsService);
   private readonly desktop = viewChild.required<ElementRef<HTMLElement>>('desktop');
 
   constructor() {
-    let destroy: (() => void) | null = null;
-    let destroyed = false;
+    const kit = signal<AsciiKit | null>(null);
+    let wallpaper: ReturnType<AsciiKit['background']> | null = null;
+
     const onHash = () => {
       const linked = this.wm.appFromHash();
       if (linked) this.wm.open(linked, undefined, this.viewport());
     };
     inject(DestroyRef).onDestroy(() => {
-      destroyed = true;
-      destroy?.();
+      wallpaper?.destroy();
       removeEventListener('hashchange', onHash);
     });
 
     afterNextRender(() => {
-      const element = this.desktop().nativeElement;
       addEventListener('hashchange', onHash);
-      // Abre o link direto (#projetos) ou, numa visita normal, o sobre.txt.
-      this.openInitial();
-
+      this.wm.open(this.wm.appFromHash() ?? 'sobre', undefined, this.viewport());
       loadAsciiKit()
-        .then(({ background, drift }) => {
-          if (destroyed) return;
-          const handle = background(element, {
-            preset: drift,
-            ink: '--ascii-ink',
-            cellSize: 12,
-            speed: 0.6,
-            charset: ' .:+*#',
-            lazy: false,
-          });
-          destroy = () => handle.destroy();
-        })
+        .then((loaded) => kit.set(loaded))
         .catch(() => {
           // Papel de parede estático.
         });
     });
+
+    // Papel de parede "matrix" conforme a configuração.
+    effect(() => {
+      const mode = this.settings.settings().wallpaper;
+      const asciiKit = kit();
+      if (!asciiKit) return;
+      if (mode === 'off') {
+        wallpaper?.destroy();
+        wallpaper = null;
+        return;
+      }
+      const preset = mode === 'rain' ? asciiKit.cascade : asciiKit.drift;
+      if (wallpaper) {
+        wallpaper.setPreset(preset);
+        return;
+      }
+      wallpaper = asciiKit.background(this.desktop().nativeElement, {
+        preset,
+        ink: '--ascii-ink',
+        cellSize: 12,
+        speed: 0.6,
+        lazy: false,
+      });
+    });
   }
 
-  protected open(icon: DesktopIcon, event: MouseEvent): void {
+  protected openFromIcon(icon: DesktopIcon, event: MouseEvent): void {
     if (icon.kind !== 'app') return;
     const desktop = this.desktop().nativeElement.getBoundingClientRect();
     const tile = (event.currentTarget as HTMLElement).getBoundingClientRect();
     this.wm.open(
       icon.id,
       { x: tile.left + tile.width / 2 - desktop.left, y: tile.top + tile.height / 2 - desktop.top },
-      { w: desktop.width, h: desktop.height },
+      this.viewport(),
     );
+  }
+
+  protected openFromMenu(id: AppId): void {
+    const viewport = this.viewport();
+    this.wm.open(id, { x: 40, y: viewport.h }, viewport);
   }
 
   private viewport(): { w: number; h: number } {
     const rect = this.desktop().nativeElement.getBoundingClientRect();
     return { w: rect.width, h: rect.height };
-  }
-
-  private openInitial(): void {
-    const viewport = this.viewport();
-    const linked = this.wm.appFromHash();
-    if (linked) {
-      this.wm.open(linked, undefined, viewport);
-      return;
-    }
-    this.wm.open('sobre', undefined, viewport);
   }
 }

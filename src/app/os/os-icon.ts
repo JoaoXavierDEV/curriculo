@@ -1,13 +1,17 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, input, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { DesktopIcon } from '../data/apps';
+import { ICON_DEFS } from './icons';
+import { SvgIcon } from './svg-icon';
 
 /**
- * Um ícone: um quadro com um glifo ASCII e o nome embaixo.
- * App → botão que abre a janela/tela. Atalho → link que abre em nova aba.
+ * Um ícone do desktop/home: desenho + nome embaixo.
+ * App → botão que abre a janela/tela. Atalho → link em nova aba, com a
+ * setinha de atalho no canto, como no Windows.
  */
 @Component({
   selector: 'app-os-icon',
+  imports: [NgTemplateOutlet, SvgIcon],
   template: `
     @let item = icon();
     @if (item.kind === 'app') {
@@ -29,19 +33,24 @@ import { DesktopIcon } from '../data/apps';
     }
 
     <ng-template #body>
-      <span class="tile" aria-hidden="true">
-        <span class="glyph">{{ item.glyph }}</span>
+      <span
+        class="art"
+        [class.tile]="item.kind === 'link'"
+        [style.background]="item.kind === 'link' ? tile() : null"
+      >
+        <app-svg-icon [name]="item.icon" />
         @if (item.kind === 'link') {
-          <span class="badge">↗</span>
+          <span class="shortcut" aria-hidden="true">↗</span>
         }
       </span>
       <span class="label">{{ item.label }}</span>
     </ng-template>
   `,
-  imports: [NgTemplateOutlet],
   styleUrl: './os-icon.css',
 })
 export class OsIcon {
   readonly icon = input.required<DesktopIcon>();
   readonly opened = output<MouseEvent>();
+
+  protected readonly tile = computed(() => ICON_DEFS[this.icon().icon].tile);
 }

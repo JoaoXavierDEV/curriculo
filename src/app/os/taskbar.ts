@@ -1,19 +1,41 @@
-import { Component, DestroyRef, afterNextRender, inject, signal } from '@angular/core';
-import { APPS, AppId, appById } from '../data/apps';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  afterNextRender,
+  inject,
+  output,
+  signal,
+} from '@angular/core';
+import { AppId, appById } from '../data/apps';
+import { IconKey } from './icons';
+import { StartMenu } from './start-menu';
+import { SvgIcon } from './svg-icon';
 import { WindowManager } from '../services/window-manager.service';
 
 /**
- * Taskbar do desktop (a antiga barra de status): botão "JX" que abre o
- * sobre.txt, um botão por janela aberta (focar / minimizar / restaurar) e o
- * relógio à direita.
+ * Taskbar do desktop: botão "JX" (menu Iniciar com programas e
+ * configurações), um botão por janela aberta (focar / minimizar / restaurar)
+ * e o relógio à direita.
  */
 @Component({
   selector: 'app-taskbar',
+  imports: [StartMenu, SvgIcon],
   host: { role: 'region', 'aria-label': 'Barra de tarefas' },
   template: `
-    <button type="button" class="start" (click)="openAbout($event)">
-      <span aria-hidden="true">▌JX▐</span><span class="sr-only">Abrir sobre mim</span>
+    <button
+      type="button"
+      class="start"
+      [class.on]="menuOpen()"
+      aria-controls="menu-iniciar"
+      [attr.aria-expanded]="menuOpen()"
+      (click)="menuOpen.set(!menuOpen())"
+    >
+      <span aria-hidden="true">▌JX▐</span> iniciar
     </button>
+    @if (menuOpen()) {
+      <app-start-menu (launch)="launch($event)" (closed)="closeMenu()" />
+    }
     <span class="mode" aria-hidden="true">{{ wm.focused() ? 'INSERT' : 'NORMAL' }}</span>
 
     <ul class="tasks" aria-label="Janelas abertas">
@@ -27,7 +49,7 @@ import { WindowManager } from '../services/window-manager.service';
             [attr.aria-pressed]="wm.focused() === win.id"
             (click)="wm.taskbarClick(win.id)"
           >
-            <span class="task-glyph" aria-hidden="true">{{ glyph(win.id) }}</span>
+            <span class="task-icon"><app-svg-icon [name]="iconOf(win.id)" /></span>
             {{ fileName(win.id) }}
           </button>
         </li>
@@ -42,6 +64,7 @@ import { WindowManager } from '../services/window-manager.service';
   `,
   styles: `
     :host {
+      position: relative;
       display: flex;
       align-items: stretch;
       height: var(--taskbar-h);
@@ -59,6 +82,9 @@ import { WindowManager } from '../services/window-manager.service';
       font-weight: 700;
       cursor: pointer;
       transition: transform 160ms var(--ease-out);
+    }
+    .start.on {
+      background: color-mix(in oklab, var(--color-phosphor) 80%, white);
     }
     .start:active {
       transform: scale(0.96);
@@ -115,8 +141,11 @@ import { WindowManager } from '../services/window-manager.service';
     .task:focus-visible {
       outline-offset: -3px;
     }
-    .task-glyph {
-      color: var(--color-phosphor);
+    .task-icon {
+      display: block;
+      width: 1.1rem;
+      height: 1.1rem;
+      flex: none;
     }
     @media (hover: hover) and (pointer: fine) {
       .task:hover {
@@ -143,13 +172,21 @@ import { WindowManager } from '../services/window-manager.service';
 })
 export class Taskbar {
   protected readonly wm = inject(WindowManager);
+  /** Pede ao desktop para abrir um programa (ele sabe o tamanho da área). */
+  readonly opened = output<AppId>();
+  protected readonly menuOpen = signal(false);
   protected readonly clock = signal('--:--');
+  private readonly element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
   protected readonly date = signal('');
 
   constructor() {
     let timer: ReturnType<typeof setInterval> | null = null;
+    const onPointer = (event: PointerEvent) => {
+      if (this.menuOpen() && !this.element.contains(event.target as Node)) this.closeMenu(false);
+    };
     inject(DestroyRef).onDestroy(() => {
       if (timer) clearInterval(timer);
+      removeEventListener('pointerdown', onPointer);
     });
 
     afterNextRender(() => {
@@ -161,22 +198,25 @@ export class Taskbar {
       };
       tick();
       timer = setInterval(tick, 15_000);
+      addEventListener('pointerdown', onPointer);
     });
   }
 
-  protected glyph(id: AppId): string {
-    return appById(id).glyph;
+  protected iconOf(id: AppId): IconKey {
+    return appById(id).icon;
   }
 
   protected fileName(id: AppId): string {
     return appById(id).file;
   }
 
-  protected openAbout(event: MouseEvent): void {
-    const target = event.currentTarget as HTMLElement;
-    const rect = target.getBoundingClientRect();
-    this.wm.open('sobre', { x: rect.left + rect.width / 2, y: rect.top });
+  protected launch(id: AppId): void {
+    this.closeMenu(false);
+    this.opened.emit(id);
   }
 
-  protected readonly apps = APPS;
+  protected closeMenu(returnFocus = true): void {
+    this.menuOpen.set(false);
+    if (returnFocus) this.element.querySelector<HTMLElement>('.start')?.focus();
+  }
 }
