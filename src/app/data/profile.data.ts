@@ -31,6 +31,8 @@ export interface Education {
   readonly start: string;
   readonly end: string;
   readonly file: string;
+  /** Logo da instituição em public/academic (400×400). */
+  readonly logo: string;
 }
 
 export interface SideProject {
@@ -199,6 +201,7 @@ export const EDUCATION: readonly Education[] = [
     start: 'fev 2025',
     end: 'abr 2026',
     file: 'pos-puc-rio.txt',
+    logo: '/academic/puc_rio_logo.jpg',
   },
   {
     institution: 'Estácio',
@@ -206,6 +209,7 @@ export const EDUCATION: readonly Education[] = [
     start: 'ago 2019',
     end: 'dez 2023',
     file: 'bacharelado-estacio.txt',
+    logo: '/academic/estacio_logo.jpg',
   },
   {
     institution: 'Senac RJ',
@@ -213,6 +217,7 @@ export const EDUCATION: readonly Education[] = [
     start: '2018',
     end: '2019',
     file: 'tecnico-senac.txt',
+    logo: '/academic/senac_rj_logo.jpg',
   },
 ];
 

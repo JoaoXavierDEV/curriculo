@@ -63,7 +63,7 @@ export const APPS: readonly AppIcon[] = [
     icon: 'briefcase',
     label: 'experiência',
     file: 'carreira.log',
-    size: { w: 700, h: 580 },
+    size: { w: 564, h: 722 },
   },
   {
     kind: 'app',
@@ -71,7 +71,7 @@ export const APPS: readonly AppIcon[] = [
     icon: 'graduation',
     label: 'formação',
     file: 'formacao/',
-    size: { w: 860, h: 480 },
+    size: { w: 960, h: 560 },
   },
   {
     kind: 'app',
@@ -79,7 +79,7 @@ export const APPS: readonly AppIcon[] = [
     icon: 'terminal',
     label: 'contato.sh',
     file: 'contato.sh',
-    size: { w: 680, h: 520 },
+    size: { w: 1106, h: 500 },
   },
   {
     kind: 'app',
@@ -87,7 +87,7 @@ export const APPS: readonly AppIcon[] = [
     icon: 'trash',
     label: 'lixeira',
     file: 'lixeira/cat.gif',
-    size: { w: 440, h: 500 },
+    size: { w: 463, h: 622 },
   },
   {
     kind: 'app',
@@ -99,7 +99,7 @@ export const APPS: readonly AppIcon[] = [
   },
 ];
 
-/** Atalhos: ficam à esquerda do desktop e abrem o link em nova aba. */
+/** Atalhos: ficam à direita do desktop e abrem o link em nova aba. */
 export const SHORTCUTS: readonly LinkIcon[] = [
   link('github', LINKS.github),
   link('linkedin', LINKS.linkedin),
@@ -114,7 +114,7 @@ export const SHORTCUTS: readonly LinkIcon[] = [
 
 const app = (id: AppId): AppIcon => APPS.find((entry) => entry.id === id)!;
 
-/** Ícones de seção no desktop (à direita); a lixeira fica sozinha no canto. */
+/** Ícones de seção no desktop (à esquerda); a lixeira fica no canto de baixo. */
 export const DESKTOP_APPS: readonly AppIcon[] = [
   'sobre',
   'projetos',

@@ -36,7 +36,6 @@ import { WindowManager } from '../services/window-manager.service';
     @if (menuOpen()) {
       <app-start-menu (launch)="launch($event)" (closed)="closeMenu()" />
     }
-    <span class="mode" aria-hidden="true">{{ wm.focused() ? 'INSERT' : 'NORMAL' }}</span>
 
     <ul class="tasks" aria-label="Janelas abertas">
       @for (win of wm.running(); track win.id) {
@@ -92,14 +91,6 @@ import { WindowManager } from '../services/window-manager.service';
     .start:focus-visible {
       outline-color: var(--color-fg);
       outline-offset: -4px;
-    }
-    .mode {
-      display: flex;
-      align-items: center;
-      padding: 0 0.8rem;
-      background: var(--color-surface-2);
-      color: var(--color-muted);
-      letter-spacing: 0.04em;
     }
     .tasks {
       display: flex;

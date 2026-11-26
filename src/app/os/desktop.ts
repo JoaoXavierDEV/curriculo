@@ -23,16 +23,6 @@ import { Taskbar } from './taskbar';
     <main class="desktop" #desktop id="conteudo">
       <h1 class="sr-only">João Xavier, Dev Full Stack .NET + Angular</h1>
 
-      <nav class="icons links" aria-label="Atalhos (abrem em nova aba)">
-        <ul>
-          @for (icon of shortcuts; track icon.id) {
-            <li [attr.data-app-icon]="icon.id">
-              <app-os-icon [icon]="icon" />
-            </li>
-          }
-        </ul>
-      </nav>
-
       <nav class="icons apps" aria-label="Área de trabalho">
         <ul>
           @for (icon of desktopApps; track icon.id) {
@@ -44,6 +34,16 @@ import { Taskbar } from './taskbar';
         <div class="trash" [attr.data-app-icon]="trash.id">
           <app-os-icon [icon]="trash" (opened)="openFromIcon(trash, $event)" />
         </div>
+      </nav>
+
+      <nav class="icons links" aria-label="Atalhos (abrem em nova aba)">
+        <ul>
+          @for (icon of shortcuts; track icon.id) {
+            <li [attr.data-app-icon]="icon.id">
+              <app-os-icon [icon]="icon" />
+            </li>
+          }
+        </ul>
       </nav>
 
       <p class="wordmark" aria-hidden="true">joaoxavier.dev</p>
@@ -94,23 +94,25 @@ import { Taskbar } from './taskbar';
       padding: 0;
       list-style: none;
     }
-    .links {
-      left: 0.75rem;
-    }
-    /* Seções à direita, de cima para baixo; a lixeira fica no canto de baixo. */
+    /* Páginas à esquerda, de cima para baixo; a lixeira fica no canto de baixo. */
     .apps {
-      right: 0.75rem;
+      left: 0.75rem;
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
     }
     .apps ul {
-      direction: rtl;
       flex: 1;
       min-height: 0;
       height: auto;
     }
-    .apps li {
+    /* Atalhos à direita: as colunas crescem da direita para a esquerda. */
+    .links {
+      right: 0.75rem;
+    }
+    .links ul {
+      direction: rtl;
+    }
+    .links li {
       direction: ltr;
     }
     .trash {
