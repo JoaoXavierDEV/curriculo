@@ -1,0 +1,98 @@
+.repo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 13rem;
+  padding: 1.6rem 1.25rem 1.1rem;
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.repo-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+/* O card inteiro é clicável pelo link do título (área de toque grande). */
+.repo-link {
+  color: var(--color-fg);
+  text-decoration: none;
+}
+
+.repo-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.repo-link:focus-visible {
+  outline: none;
+}
+
+.repo:has(.repo-link:focus-visible) {
+  outline: 2px solid var(--color-phosphor);
+  outline-offset: 3px;
+}
+
+.repo-desc {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.86rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.repo-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--color-line);
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .repo:hover {
+    border-color: var(--color-phosphor-dim);
+    background: var(--color-surface-2);
+  }
+
+  .repo:hover .repo-title {
+    color: var(--color-phosphor);
+  }
+}
+
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  min-height: 13rem;
+  padding: 1.6rem 1.25rem 1.1rem;
+}
+
+.skeleton-line {
+  display: block;
+  height: 0.8rem;
+  background: repeating-linear-gradient(90deg, var(--color-line) 0 0.5ch, transparent 0.5ch 0.7ch);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-line {
+    animation: none;
+  }
+}

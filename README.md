@@ -1,59 +1,21 @@
-# Curriculo
+# joaoxavier.dev
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.3.0.
+Meu site pessoal: links, projetos finalizados do GitHub, experiência e formação, com cara de terminal e arte ASCII.
 
-## Development server
+- **Stack:** Angular 22 (standalone, signals, zoneless), Tailwind 4, [asciify-engine](https://asciify.org) para o fundo do hero, os títulos e o wordmark do rodapé.
+- **Projetos:** vêm ao vivo da API do GitHub. Aparecem os repositórios com a topic `finalizado`; sem nenhum, uma lista curada; se a API falhar, um snapshot em `src/app/data/repos.fallback.ts`.
+- **Dados pessoais:** tudo em `src/app/data/profile.data.ts`.
+- **Arte ASCII:** o banner do nome (FIGlet) e o retrato (asciify-engine) são gerados por `npm run ascii` e salvos em `src/app/data/ascii-art.ts`.
 
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Rodar
 
 ```bash
-ng generate component component-name
+npm install
+npm start          # http://localhost:4200
+npx ng test --watch=false
+npm run build      # dist/curriculo/browser
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Deploy
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Push na `main` roda `.github/workflows/azure-static-web-apps.yml`: testes, build e upload para o Azure Static Web Apps (grupo `salome`). O token fica no secret `AZURE_STATIC_WEB_APPS_API_TOKEN`. Cabeçalhos, CSP e fallback de rota ficam em `public/staticwebapp.config.json`.

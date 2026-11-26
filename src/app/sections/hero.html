@@ -1,0 +1,41 @@
+<div class="hero-inner">
+  <div class="hero-copy" #copy>
+    <p class="prompt text-sm text-muted">whoami</p>
+
+    <h1 id="hero-title" class="sr-only">{{ profile.name }}, {{ profile.role }}</h1>
+    <div class="banner-wrap">
+      <pre class="ascii banner" aria-hidden="true">{{ banner }}</pre>
+    </div>
+
+    <p class="role cursor">{{ profile.role }}</p>
+    <p class="bio">{{ profile.bio }}</p>
+    <p class="text-sm text-muted">
+      <span aria-hidden="true" class="text-phosphor">@</span> {{ profile.location }} · remoto
+    </p>
+
+    <div class="mt-7 flex flex-wrap gap-3">
+      <a class="btn btn-primary" href="#links">ver meus links <span aria-hidden="true">↓</span></a>
+      <a class="btn" href="#contato">falar comigo</a>
+    </div>
+
+    <ul class="mt-8 flex flex-wrap gap-2" aria-label="Stack principal">
+      @for (tech of profile.stack; track tech) {
+        <li class="tag">{{ tech }}</li>
+      }
+    </ul>
+  </div>
+
+  <figure class="portrait frame frame-corners">
+    <span class="frame-label" aria-hidden="true">avatar.jpg | asciify-engine</span>
+    <div class="portrait-wrap">
+      <pre
+        class="ascii portrait-art"
+        role="img"
+        aria-label="Retrato do João Xavier desenhado com caracteres ASCII"
+        >{{ portrait }}</pre>
+    </div>
+    <figcaption class="portrait-caption">
+      <span class="text-phosphor">●</span> online · 42 colunas, 0 pixels
+    </figcaption>
+  </figure>
+</div>

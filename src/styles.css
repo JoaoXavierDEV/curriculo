@@ -1,3 +1,313 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+/* ── Tokens ─────────────────────────────────────────────────────────────── */
+@theme {
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-display: 'VT323', 'JetBrains Mono', ui-monospace, monospace;
+
+  --color-ground: #0a0c0b;
+  --color-surface: #101412;
+  --color-surface-2: #151b18;
+  --color-line: #24302a;
+  --color-line-strong: #3a4a41;
+  --color-fg: #d9e2dc;
+  --color-muted: #93a199;
+  --color-faint: #84918a;
+  --color-phosphor: #5cf08f;
+  --color-phosphor-dim: #2e8a52;
+  --color-amber: #f0c674;
+}
+
+:root {
+  color-scheme: dark;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --header-h: 3.5rem;
+
+  /* Tintas do asciify-engine derivadas dos tokens (ver skill applying-asciify). */
+  --ascii-ink: color-mix(in oklab, var(--color-phosphor-dim) 55%, var(--color-ground));
+  --ascii-ink-strong: color-mix(in oklab, var(--color-fg) 92%, var(--color-ground));
+  --ascii-success: var(--color-phosphor);
+  --ascii-warning: var(--color-amber);
+  --ascii-error: #ff6b6b;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + 1rem);
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--color-ground);
+  color: var(--color-fg);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--color-phosphor);
+  color: var(--color-ground);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-phosphor);
+  outline-offset: 3px;
+}
+
+/* Grão e scanlines muito discretos sobre a página inteira. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2px,
+    rgb(0 0 0 / 0.14) 3px,
+    transparent 4px
+  );
+  mix-blend-mode: multiply;
+}
+
+@layer components {
+  /* ── Utilitários de texto ASCII ───────────────────────────────────────── */
+  .ascii {
+    font-family: var(--font-mono);
+    white-space: pre;
+    line-height: 1.05;
+    letter-spacing: 0;
+    font-variant-ligatures: none;
+    margin: 0;
+  }
+
+  .prompt::before {
+    content: '$ ';
+    color: var(--color-phosphor);
+  }
+
+  .cursor::after {
+    content: '';
+    display: inline-block;
+    width: 0.6em;
+    height: 1.1em;
+    margin-left: 0.15em;
+    vertical-align: -0.18em;
+    background: var(--color-phosphor);
+    animation: blink 1.1s steps(1) infinite;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* ── Seções ──────────────────────────────────────────────────────────── */
+  .section {
+    position: relative;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding: 5rem 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .section {
+      padding: 7rem 2rem;
+    }
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.4rem, 1.6rem + 3vw, 3.6rem);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    margin: 0;
+    color: var(--color-fg);
+    text-wrap: balance;
+  }
+
+  .section-title .hash {
+    color: var(--color-phosphor);
+  }
+
+  .section-kicker {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin: 0 0 0.75rem;
+  }
+
+  .section-lede {
+    color: var(--color-muted);
+    max-width: 46ch;
+    margin: 1rem 0 0;
+    text-wrap: pretty;
+  }
+
+  /* ── Moldura de terminal (box-drawing com bordas CSS) ───────────────── */
+  .frame {
+    position: relative;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    border-radius: 2px;
+  }
+
+  .frame-label {
+    position: absolute;
+    top: -0.8em;
+    left: 0.9rem;
+    padding-inline: 0.45rem;
+    background: var(--color-ground);
+    color: var(--color-muted);
+    font-size: 0.78rem;
+    line-height: 1.6;
+    max-width: calc(100% - 1.8rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .frame-corners::before,
+  .frame-corners::after {
+    position: absolute;
+    font-size: 0.8rem;
+    line-height: 1;
+    color: var(--color-line-strong);
+    pointer-events: none;
+  }
+
+  .frame-corners::before {
+    content: '+';
+    top: -0.45em;
+    left: -0.3em;
+  }
+
+  .frame-corners::after {
+    content: '+';
+    right: -0.3em;
+    bottom: -0.5em;
+  }
+
+  /* ── Botões e links pressionáveis ───────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.55rem 1rem;
+    border: 1px solid var(--color-line-strong);
+    background: var(--color-surface);
+    color: var(--color-fg);
+    font: inherit;
+    font-size: 0.9rem;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    transition:
+      transform 160ms var(--ease-out),
+      border-color 140ms ease,
+      background-color 140ms ease,
+      color 140ms ease;
+  }
+
+  .btn:active {
+    transform: scale(0.97);
+  }
+
+  .btn-primary {
+    background: var(--color-phosphor);
+    border-color: var(--color-phosphor);
+    color: var(--color-ground);
+    font-weight: 700;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn:hover {
+      border-color: var(--color-phosphor);
+      color: var(--color-phosphor);
+    }
+
+    .btn-primary:hover {
+      background: color-mix(in oklab, var(--color-phosphor) 85%, white);
+      color: var(--color-ground);
+    }
+  }
+
+  .link {
+    color: var(--color-phosphor);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, var(--color-phosphor) 40%, transparent);
+    text-underline-offset: 0.22em;
+    transition: text-decoration-color 140ms ease;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .link:hover {
+      text-decoration-color: currentColor;
+    }
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 0 0.4rem;
+    border: 1px solid var(--color-line);
+    color: var(--color-muted);
+    font-size: 0.78rem;
+    line-height: 1.7;
+    white-space: nowrap;
+  }
+
+  /* ── Entrada ao rolar (ver RevealDirective) ──────────────────────────── */
+  [data-reveal] {
+    transition:
+      opacity 520ms var(--ease-out),
+      transform 520ms var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 45ms);
+  }
+
+  [data-reveal='hidden'] {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal] {
+      transition: opacity 200ms ease;
+      transition-delay: 0ms;
+    }
+
+    [data-reveal='hidden'] {
+      transform: none;
+    }
+
+    .cursor::after {
+      animation: none;
+    }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}

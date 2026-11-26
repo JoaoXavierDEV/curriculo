@@ -1,24 +1,38 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { App } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
+    sessionStorage.clear();
     await TestBed.configureTestingModule({
       imports: [App],
-    })
-      .compileComponents();
+      providers: [provideHttpClient(), provideHttpClientTesting()],
+    }).compileComponents();
   });
 
-  it('should create the app', () => {
+  it('renderiza o nome como h1 acessível', async () => {
     const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
-
-  it('should render title', async () => {
-    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    TestBed.inject(HttpTestingController)
+      .match((req) => req.url.startsWith('https://api.github.com/'))
+      .forEach((req) => req.flush([]));
     await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, curriculo');
+    const h1 = (fixture.nativeElement as HTMLElement).querySelector('h1');
+    expect(h1?.textContent).toContain('João Xavier');
+  });
+
+  it('tem todas as seções do menu', async () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    TestBed.inject(HttpTestingController)
+      .match((req) => req.url.startsWith('https://api.github.com/'))
+      .forEach((req) => req.flush([]));
+    await fixture.whenStable();
+    const root = fixture.nativeElement as HTMLElement;
+    for (const id of ['links', 'projetos', 'experiencia', 'formacao', 'contato']) {
+      expect(root.querySelector(`#${id}`), id).not.toBeNull();
+    }
   });
 });
