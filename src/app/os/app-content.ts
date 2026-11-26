@@ -6,12 +6,24 @@ import { EducationSection } from '../sections/education';
 import { ExperienceSection } from '../sections/experience';
 import { Projects } from '../sections/projects';
 import { Trash } from '../sections/trash';
+import { ProjectDetail } from '../sections/project-detail';
 import { SettingsPanel } from './settings-panel';
+import { TerminalApp } from './terminal/terminal-app';
 
 /** O conteúdo de cada app, igual na janela do desktop e na tela do celular. */
 @Component({
   selector: 'app-content',
-  imports: [About, Projects, ExperienceSection, EducationSection, Contact, Trash, SettingsPanel],
+  imports: [
+    About,
+    Projects,
+    ExperienceSection,
+    EducationSection,
+    Contact,
+    Trash,
+    SettingsPanel,
+    ProjectDetail,
+    TerminalApp,
+  ],
   template: `
     @switch (app()) {
       @case ('sobre') {
@@ -28,6 +40,12 @@ import { SettingsPanel } from './settings-panel';
       }
       @case ('contato') {
         <app-contact />
+      }
+      @case ('projeto') {
+        <app-project-detail />
+      }
+      @case ('terminal') {
+        <app-terminal />
       }
       @case ('lixeira') {
         <app-trash />

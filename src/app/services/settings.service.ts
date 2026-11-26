@@ -1,4 +1,5 @@
-import { Service, effect, signal } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Service, effect, inject, signal } from '@angular/core';
 
 export type WallpaperMode = 'off' | 'waves' | 'rain';
 export type CrtMode = 'off' | 'subtle' | 'strong';
@@ -56,14 +57,15 @@ function read(): Settings {
 @Service()
 export class SettingsService {
   readonly settings = signal<Settings>(read());
+  private readonly document = inject(DOCUMENT);
 
   constructor() {
     effect(() => {
       const current = this.settings();
-      const root = document.documentElement.dataset;
-      root['crt'] = current.crt;
-      root['iconSize'] = current.iconSize;
-      root['iconStyle'] = current.iconStyle;
+      const root = this.document.documentElement;
+      root.setAttribute('data-crt', current.crt);
+      root.setAttribute('data-icon-size', current.iconSize);
+      root.setAttribute('data-icon-style', current.iconStyle);
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
       } catch {

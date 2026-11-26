@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "postbuild": "node scripts/sitemap.mjs"
   },
   "private": true,
   "packageManager": "npm@10.9.9",
@@ -16,7 +17,9 @@
     "@angular/core": "^22.3.0",
     "@angular/forms": "^22.3.0",
     "@angular/platform-browser": "^22.3.0",
+    "@angular/platform-server": "^22.3.0",
     "@angular/router": "^22.3.0",
+    "@angular/ssr": "^22.3.0",
     "asciify-engine": "^4.33.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
@@ -26,6 +29,7 @@
     "@angular/cli": "^22.3.0",
     "@angular/compiler-cli": "^22.3.0",
     "@tailwindcss/postcss": "^4.1.12",
+    "@types/node": "^22.12.0",
     "axe-core": "^4.14.1",
     "jsdom": "^31.0.0",
     "postcss": "^8.5.3",

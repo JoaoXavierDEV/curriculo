@@ -3,7 +3,7 @@
     command="gh repo list --topic finalizado"
     title="Projetos finalizados"
     headingId="projetos-title"
-    lede="Coisas que eu terminei (sim, dá pra terminar projeto pessoal). Vem direto da API do GitHub."
+    lede="Coisas que eu terminei (sim, dá pra terminar projeto pessoal). Clique num projeto para ver os detalhes."
   />
 
   <div aria-live="polite" [attr.aria-busy]="loading()">
@@ -21,12 +21,37 @@
       </ul>
     } @else {
       <ul class="grid gap-6 @xl:grid-cols-2 @4xl:grid-cols-3">
-        @for (repo of repos(); track repo.name; let i = $index) {
+        @for (study of featured; track study.slug) {
+          <li class="frame repo featured">
+            <span class="frame-label" aria-hidden="true">./{{ study.slug }}</span>
+            <h3 class="repo-title">
+              <a
+                class="repo-link"
+                [href]="'/projetos/' + study.slug"
+                (click)="open($event, study.slug)"
+                >{{ study.name }}</a
+              >
+              <span class="pin">destaque</span>
+            </h3>
+            <p class="repo-desc">{{ study.tagline }}</p>
+            <div class="repo-meta">
+              <span
+                ><span class="text-phosphor" aria-hidden="true">●</span>
+                {{ study.stack.slice(0, 3).join(' · ') }}</span
+              >
+              <span class="private">código privado</span>
+            </div>
+          </li>
+        }
+        @for (repo of others(); track repo.name; let i = $index) {
           <li class="frame repo" [appReveal]="i % 3">
             <span class="frame-label" aria-hidden="true">./{{ repo.name.toLowerCase() }}</span>
             <h3 class="repo-title">
-              <a class="repo-link" [href]="repo.url" target="_blank" rel="noopener noreferrer"
-                >{{ repo.name }}<span class="sr-only"> (abre o repositório em nova aba)</span></a
+              <a
+                class="repo-link"
+                [href]="'/projetos/' + slugOf(repo.name)"
+                (click)="open($event, slugOf(repo.name))"
+                >{{ repo.name }}</a
               >
             </h3>
             <p class="repo-desc">{{ repo.description || 'Sem descrição (ainda).' }}</p>
@@ -44,6 +69,15 @@
                 <span class="sr-only">atualizado em</span>
                 <time [attr.datetime]="repo.updatedAt">{{ repo.updatedAt | date: 'MM/yyyy' }}</time>
               </span>
+              <a
+                class="link relative z-10"
+                [href]="repo.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                >repo<span class="sr-only">
+                  de {{ repo.name }} no GitHub (abre em nova aba)</span
+                ></a
+              >
               @if (repo.homepage) {
                 <a
                   class="link relative z-10"

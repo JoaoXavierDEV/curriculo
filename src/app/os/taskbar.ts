@@ -12,6 +12,7 @@ import { IconKey } from './icons';
 import { StartMenu } from './start-menu';
 import { SvgIcon } from './svg-icon';
 import { WindowManager } from '../services/window-manager.service';
+import { OsNavigator } from './os-navigator.service';
 
 /**
  * Taskbar do desktop: botão "JX" (menu Iniciar com programas e
@@ -46,7 +47,7 @@ import { WindowManager } from '../services/window-manager.service';
             [class.active]="wm.focused() === win.id"
             [class.min]="win.minimized"
             [attr.aria-pressed]="wm.focused() === win.id"
-            (click)="wm.taskbarClick(win.id)"
+            (click)="nav.taskbarClick(win.id)"
           >
             <span class="task-icon"><app-svg-icon [name]="iconOf(win.id)" /></span>
             {{ fileName(win.id) }}
@@ -163,6 +164,7 @@ import { WindowManager } from '../services/window-manager.service';
 })
 export class Taskbar {
   protected readonly wm = inject(WindowManager);
+  protected readonly nav = inject(OsNavigator);
   /** Pede ao desktop para abrir um programa (ele sabe o tamanho da área). */
   readonly opened = output<AppId>();
   protected readonly menuOpen = signal(false);
@@ -171,15 +173,12 @@ export class Taskbar {
   protected readonly date = signal('');
 
   constructor() {
-    let timer: ReturnType<typeof setInterval> | null = null;
+    const destroyRef = inject(DestroyRef);
     const onPointer = (event: PointerEvent) => {
       if (this.menuOpen() && !this.element.contains(event.target as Node)) this.closeMenu(false);
     };
-    inject(DestroyRef).onDestroy(() => {
-      if (timer) clearInterval(timer);
-      removeEventListener('pointerdown', onPointer);
-    });
 
+    // Relógio e clique fora do menu: só no navegador.
     afterNextRender(() => {
       const tick = () => {
         const now = new Date();
@@ -188,8 +187,12 @@ export class Taskbar {
         this.date.set(`${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`);
       };
       tick();
-      timer = setInterval(tick, 15_000);
+      const timer = setInterval(tick, 15_000);
       addEventListener('pointerdown', onPointer);
+      destroyRef.onDestroy(() => {
+        clearInterval(timer);
+        removeEventListener('pointerdown', onPointer);
+      });
     });
   }
 
@@ -198,7 +201,8 @@ export class Taskbar {
   }
 
   protected fileName(id: AppId): string {
-    return appById(id).file;
+    const slug = this.wm.projectSlug();
+    return id === 'projeto' && slug ? `projetos/${slug}.md` : appById(id).file;
   }
 
   protected launch(id: AppId): void {

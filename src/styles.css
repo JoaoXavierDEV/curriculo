@@ -1,6 +1,27 @@
 @import 'tailwindcss';
 
 /* ── Tokens ─────────────────────────────────────────────────────────────── */
+/* Os desenhos com caracteres (─ ┌ │ █ ▶ ←) não vêm na JetBrains Mono do Google
+   Fonts. Esta face completa (OFL, public/fonts) cobre só esses blocos, com a
+   mesma largura das letras; o navegador só baixa se a página usar o caractere. */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+  unicode-range: U+2190-21FF, U+2500-25FF;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/JetBrainsMono-Bold.woff2') format('woff2');
+  unicode-range: U+2190-21FF, U+2500-25FF;
+}
+
 @theme {
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --font-display: 'VT323', 'JetBrains Mono', ui-monospace, monospace;
@@ -59,32 +80,46 @@ body {
   overscroll-behavior: none;
 }
 
-/* ── Efeito CRT (configurável no Iniciar) ──────────────────────────────── */
-html[data-crt='subtle'] body::after,
-html[data-crt='strong'] body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 3000;
-  pointer-events: none;
-  background: repeating-linear-gradient(to bottom, transparent 0 3px, rgb(0 0 0 / 0.1) 3px 4px);
+/* ── Efeito CRT (configurável no Iniciar) ──────────────────────────────────
+   Fica no papel de parede e no FUNDO das janelas, nunca por cima do conteúdo:
+   imagens e texto aparecem sem as linhas. */
+html[data-crt='subtle'] {
+  --crt-lines: repeating-linear-gradient(to bottom, transparent 0 3px, rgb(0 0 0 / 0.1) 3px 4px);
 }
 
-html[data-crt='strong'] body::after {
+html[data-crt='strong'] {
+  --crt-lines: repeating-linear-gradient(to bottom, transparent 0 2px, rgb(0 0 0 / 0.22) 2px 4px);
+}
+
+html:is([data-crt='subtle'], [data-crt='strong'])
+  :is(app-desktop .desktop, app-phone .wallpaper)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--crt-lines);
+}
+
+html[data-crt='strong'] :is(app-desktop .desktop, app-phone .wallpaper)::after {
   background:
     radial-gradient(ellipse 120% 100% at 50% 50%, transparent 60%, rgb(0 0 0 / 0.45) 100%),
-    repeating-linear-gradient(to bottom, transparent 0 2px, rgb(0 0 0 / 0.22) 2px 4px);
+    var(--crt-lines);
 }
 
-/* Forte: faixa de refresh descendo devagar. */
-html[data-crt='strong'] body::before {
+html:is([data-crt='subtle'], [data-crt='strong']) :is(app-window .body, app-phone .screen-body) {
+  background-image: var(--crt-lines);
+}
+
+/* Forte: faixa de refresh descendo devagar pelo papel de parede. */
+html[data-crt='strong'] app-desktop .desktop::before {
   content: '';
-  position: fixed;
+  position: absolute;
   inset: 0 0 auto 0;
-  z-index: 3000;
+  z-index: 0;
   height: 20vh;
   pointer-events: none;
-  background: linear-gradient(to bottom, transparent, rgb(92 240 143 / 0.04), transparent);
+  background: linear-gradient(to bottom, transparent, rgb(92 240 143 / 0.05), transparent);
   animation: crt-band 8s linear infinite;
 }
 
@@ -98,9 +133,17 @@ html[data-crt='strong'] body::before {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html[data-crt='strong'] body::before {
+  html[data-crt='strong'] app-desktop .desktop::before {
     animation: none;
     display: none;
+  }
+}
+
+/* O HTML pré-renderizado é o desktop; no celular ele fica escondido até o app
+   decidir o modo (data-os), para não piscar antes de virar a home. */
+@media (max-width: 767px) {
+  html:not([data-os]) app-desktop {
+    visibility: hidden;
   }
 }
 

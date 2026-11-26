@@ -127,6 +127,17 @@ export const ICON_DEFS = {
       { d: 'M6 10.5l3 2.5-3 2.5M11 16h6', fill: 'none', stroke: '#5cf08f', strokeWidth: 1.6 },
     ],
   },
+  contact: {
+    tile: '#13201a',
+    ink: '#5cf08f',
+    shapes: [
+      { d: 'M2.5 5h19v14h-19z', fill: '#e8efe9' },
+      { d: 'M2.5 5h19v3h-19z', fill: '#2e8a52' },
+      { d: 'M8 10.2a2 2 0 1 1 0 4 2 2 0 0 1 0-4z', fill: '#3a4a41' },
+      { d: 'M4.8 17.3c.5-1.6 1.7-2.4 3.2-2.4s2.7.8 3.2 2.4z', fill: '#3a4a41' },
+      { d: 'M13 11h6M13 13.5h6M13 16h4', fill: 'none', stroke: '#93a199', strokeWidth: 1.2 },
+    ],
+  },
   trash: {
     tile: '#13201a',
     ink: '#d9e2dc',

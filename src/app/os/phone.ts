@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   DestroyRef,
   afterNextRender,
   afterRenderEffect,
@@ -9,16 +10,18 @@ import {
 } from '@angular/core';
 import { APPS, AppId, DesktopIcon, PHONE_ICONS } from '../data/apps';
 import { PROFILE } from '../data/profile.data';
+import { projectMeta } from '../data/projects';
 import { SettingsService } from '../services/settings.service';
 import { WindowManager } from '../services/window-manager.service';
-import { AsciiKit, loadAsciiKit } from '../ui/ascii-kit';
+import { AsciiKit, OFFSCREEN_CLEAR, loadAsciiKit } from '../ui/ascii-kit';
 import { AppContent } from './app-content';
 import { OsIcon } from './os-icon';
+import { OsNavigator } from './os-navigator.service';
 
 /**
  * Celular: uma home no estilo Android. Os ícones de seção abrem "apps" em
- * tela cheia com "voltar" no topo; os atalhos abrem o link. Cada app entra no
- * histórico, então o voltar do sistema (gesto ou botão) também fecha o app.
+ * tela cheia com "voltar" no topo; os atalhos abrem o link. Cada app é uma
+ * rota, então o voltar do sistema (gesto ou botão) também fecha o app.
  */
 @Component({
   selector: 'app-phone',
@@ -28,10 +31,15 @@ import { OsIcon } from './os-icon';
 })
 export class Phone {
   protected readonly wm = inject(WindowManager);
+  protected readonly nav = inject(OsNavigator);
   protected readonly icons = PHONE_ICONS;
   protected readonly apps = APPS;
   protected readonly profile = PROFILE;
 
+  protected readonly projectName = computed(() => {
+    const slug = this.wm.projectSlug();
+    return slug ? projectMeta(slug).name : 'projeto';
+  });
   protected readonly clock = signal('--:--');
   protected readonly date = signal('');
   /** De onde cada app "cresce" ao abrir: o centro do ícone tocado. */
@@ -41,15 +49,6 @@ export class Phone {
 
   constructor() {
     const destroyRef = inject(DestroyRef);
-    const onPop = () => this.wm.syncFromHistory();
-    // Link interno para #projetos etc. (troca só o hash): abre como um app.
-    const onHash = () => {
-      const linked = this.wm.appFromHash();
-      if (linked && this.wm.phoneApp() !== linked) {
-        history.replaceState(null, '', location.pathname + location.search);
-        this.wm.openPhoneApp(linked);
-      }
-    };
 
     // Foco: entra no "voltar" do app aberto; volta para o ícone ao sair.
     afterRenderEffect(() => {
@@ -74,14 +73,6 @@ export class Phone {
       };
       tick();
       const timer = setInterval(tick, 15_000);
-      addEventListener('popstate', onPop);
-      addEventListener('hashchange', onHash);
-
-      const linked = this.wm.appFromHash();
-      if (linked) {
-        history.replaceState(null, '', location.pathname + location.search);
-        this.wm.openPhoneApp(linked);
-      }
 
       loadAsciiKit()
         .then((loaded) => kit.set(loaded))
@@ -91,8 +82,6 @@ export class Phone {
 
       destroyRef.onDestroy(() => {
         clearInterval(timer);
-        removeEventListener('popstate', onPop);
-        removeEventListener('hashchange', onHash);
       });
     });
 
@@ -111,7 +100,7 @@ export class Phone {
         wallpaper = null;
         return;
       }
-      const preset = mode === 'rain' ? asciiKit.cascade : asciiKit.drift;
+      const preset = mode === 'rain' ? asciiKit.cascade : asciiKit.caustics;
       if (wallpaper) wallpaper.setPreset(preset);
       else
         wallpaper = asciiKit.background(host, {
@@ -119,6 +108,7 @@ export class Phone {
           ink: '--ascii-ink',
           cellSize: 12,
           speed: 0.5,
+          clear: OFFSCREEN_CLEAR,
         });
     });
   }
@@ -128,16 +118,16 @@ export class Phone {
     const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
     this.origin.set(`${rect.left + rect.width / 2}px ${rect.top + rect.height / 2}px`);
     this.lastIcon = icon.id;
-    this.wm.openPhoneApp(icon.id);
+    this.nav.open(icon.id);
   }
 
   protected openAbout(): void {
     this.origin.set('50% 20%');
     this.lastIcon = null;
-    this.wm.openPhoneApp('sobre');
+    this.nav.open('sobre');
   }
 
   protected home(): void {
-    if (this.wm.phoneApp()) this.wm.phoneBack();
+    if (this.wm.phoneApp()) this.nav.home();
   }
 }

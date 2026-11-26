@@ -54,13 +54,4 @@ describe('WindowManager', () => {
     const small = TestBed.inject(WindowManager);
     expect(small.state('sobre').open).toBe(false);
   });
-
-  it('no celular, o app entra no histórico e o voltar fecha', () => {
-    wm.openPhoneApp('formacao');
-    expect(wm.phoneApp()).toBe('formacao');
-    expect(location.hash).toBe('#formacao');
-    history.replaceState(null, '', '/');
-    wm.syncFromHistory();
-    expect(wm.phoneApp()).toBeNull();
-  });
 });

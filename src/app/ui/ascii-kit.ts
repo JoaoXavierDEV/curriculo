@@ -18,3 +18,11 @@ export const TERMINAL_ALPHABETS = ['01', '#%&@*+=-:.', '0123456789ABCDEF'];
 export function prefersReducedMotion(): boolean {
   return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
+
+let offscreen: DOMRect[] | null = null;
+
+/**
+ * "Área livre" fora da tela: faz os papéis de parede cobrirem tudo, sem o meio vazio.
+ * O kit pede o mesmo array a cada quadro, então ele é criado uma vez só.
+ */
+export const OFFSCREEN_CLEAR = (): DOMRect[] => (offscreen ??= [new DOMRect(-100, -100, 1, 1)]);

@@ -41,10 +41,12 @@
     [style.transform-origin]="origin()"
   >
     <header class="appbar">
-      <button type="button" class="back" (click)="wm.phoneBack()">
+      <button type="button" class="back" (click)="nav.back()">
         <span aria-hidden="true">←</span> voltar
       </button>
-      <span class="appbar-title" [id]="'tela-' + app.id + '-title'">{{ app.label }}</span>
+      <span class="appbar-title" [id]="'tela-' + app.id + '-title'">{{
+        app.id === 'projeto' ? projectName() : app.label
+      }}</span>
       <span class="appbar-file" aria-hidden="true">{{ app.file }}</span>
     </header>
     <div class="screen-body">
@@ -56,7 +58,7 @@
 <nav class="navbar" aria-label="Navegação do sistema">
   <button
     type="button"
-    (click)="wm.phoneBack()"
+    (click)="nav.back()"
     [disabled]="wm.phoneApp() === null"
     aria-label="Voltar"
   >

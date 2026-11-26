@@ -1,14 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 import { App } from './app';
+import { routes } from './app.routes';
 
 describe('App', () => {
   beforeEach(async () => {
     sessionStorage.clear();
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter(routes)],
     }).compileComponents();
   });
 
@@ -31,7 +33,7 @@ describe('App', () => {
       .forEach((req) => req.flush([]));
     await fixture.whenStable();
     const root = fixture.nativeElement as HTMLElement;
-    for (const id of ['sobre', 'projetos', 'experiencia', 'formacao', 'contato']) {
+    for (const id of ['sobre', 'projetos', 'experiencia', 'formacao', 'contato', 'lixeira']) {
       expect(root.querySelector(`#${id}`), id).not.toBeNull();
     }
   });

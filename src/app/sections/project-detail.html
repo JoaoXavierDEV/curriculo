@@ -1,0 +1,164 @@
+<article class="section project" [attr.aria-labelledby]="'projeto-' + slug() + '-title'">
+  @if (study(); as study) {
+    <p class="section-kicker">
+      <span class="prompt">cat projetos/{{ study.slug }}.md</span>
+    </p>
+    <header class="head">
+      <h2 class="name" [id]="'projeto-' + slug() + '-title'">{{ study.name }}</h2>
+      <p class="tagline">{{ study.tagline }}</p>
+      <dl class="facts">
+        <div>
+          <dt>papel</dt>
+          <dd>{{ study.role }}</dd>
+        </div>
+        <div>
+          <dt>período</dt>
+          <dd>{{ study.period }}</dd>
+        </div>
+        <div>
+          <dt>status</dt>
+          <dd>
+            {{ study.status }}
+            @if (study.private) {
+              <span class="badge">código privado</span>
+            }
+          </dd>
+        </div>
+      </dl>
+      <ul class="chips" aria-label="Stack">
+        @for (tech of study.stack; track tech) {
+          <li class="tag">{{ tech }}</li>
+        }
+      </ul>
+      <p class="links">
+        @for (link of study.links; track link.href) {
+          <a class="btn" [href]="link.href" target="_blank" rel="noopener noreferrer"
+            >{{ link.label }} <span aria-hidden="true">↗</span
+            ><span class="sr-only">(abre em nova aba)</span></a
+          >
+        }
+      </p>
+    </header>
+
+    @if (study.gallery.length) {
+      <section class="gallery-wrap" aria-label="Telas">
+        <ul class="gallery">
+          @for (image of study.gallery; track image.src) {
+            <li>
+              <button type="button" class="shot" (click)="open($index)">
+                <img
+                  [ngSrc]="image.src"
+                  [width]="image.width"
+                  [height]="image.height"
+                  [alt]="image.alt"
+                />
+                <span class="caption">{{ image.caption }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    @for (section of study.sections; track section.title) {
+      <section class="block">
+        <h3 class="block-title">{{ section.title }}</h3>
+        @for (paragraph of section.paragraphs ?? []; track $index) {
+          <p>{{ paragraph }}</p>
+        }
+        @if (section.diagram) {
+          <figure
+            class="diagram"
+            tabindex="0"
+            aria-label="Diagrama (role para os lados se não couber)"
+          >
+            <pre class="ascii" role="img" [attr.aria-label]="section.diagramLabel">{{
+              section.diagram
+            }}</pre>
+          </figure>
+        }
+        @if (section.bullets?.length) {
+          <ul class="bullets">
+            @for (bullet of section.bullets; track $index) {
+              <li>{{ bullet }}</li>
+            }
+          </ul>
+        }
+      </section>
+    }
+
+    @if (study.learnings.length) {
+      <section class="block">
+        <h3 class="block-title">o que aprendi</h3>
+        <ul class="bullets">
+          @for (item of study.learnings; track $index) {
+            <li>{{ item }}</li>
+          }
+        </ul>
+      </section>
+    }
+  } @else if (repo(); as repo) {
+    <p class="section-kicker">
+      <span class="prompt">cat {{ repo.name }}/README.md</span>
+    </p>
+    <header class="head">
+      <h2 class="name" [id]="'projeto-' + slug() + '-title'">{{ repo.name }}</h2>
+      @if (repo.description) {
+        <p class="tagline">{{ repo.description }}</p>
+      }
+      <p class="links">
+        <a class="btn" [href]="repo.url" target="_blank" rel="noopener noreferrer"
+          >repositório no GitHub <span aria-hidden="true">↗</span
+          ><span class="sr-only">(abre em nova aba)</span></a
+        >
+        @if (repo.homepage) {
+          <a class="btn" [href]="repo.homepage" target="_blank" rel="noopener noreferrer"
+            >demo <span aria-hidden="true">↗</span
+            ><span class="sr-only">(abre em nova aba)</span></a
+          >
+        }
+      </p>
+    </header>
+
+    @if (readme.hasValue()) {
+      <div class="readme" [innerHTML]="readme.value()"></div>
+    } @else if (readme.error()) {
+      <p class="muted">Não consegui carregar o README agora. Ele está no repositório.</p>
+    } @else {
+      <p class="muted" aria-live="polite">carregando README…</p>
+    }
+  } @else {
+    <h2 class="name" [id]="'projeto-' + slug() + '-title'">projeto não encontrado</h2>
+    <p class="muted">Não achei "{{ slug() }}". Veja a lista em projetos/.</p>
+  }
+</article>
+
+<dialog
+  #lightbox
+  class="lightbox"
+  aria-label="Imagem ampliada"
+  (close)="zoomIndex.set(null)"
+  (click)="onBackdrop($event)"
+  (keydown.arrowright)="step(1)"
+  (keydown.arrowleft)="step(-1)"
+>
+  @if (zoomed(); as image) {
+    <figure class="viewer">
+      <img [src]="image.src" [alt]="image.alt" />
+      <figcaption class="viewer-bar">
+        <button type="button" class="btn" (click)="step(-1)" [disabled]="gallerySize() < 2">
+          <span aria-hidden="true">←</span> anterior
+        </button>
+        <span class="viewer-caption" aria-live="polite">
+          {{ image.caption }} · {{ zoomIndex()! + 1 }}/{{ gallerySize() }}
+        </span>
+        <button type="button" class="btn" (click)="step(1)" [disabled]="gallerySize() < 2">
+          próxima <span aria-hidden="true">→</span>
+        </button>
+        <button type="button" class="btn viewer-close" (click)="closeZoom()">
+          <span aria-hidden="true">×</span> fechar
+        </button>
+      </figcaption>
+    </figure>
+  }
+</dialog>

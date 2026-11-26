@@ -10,6 +10,7 @@ import {
 import { AppIcon } from '../data/apps';
 import { WindowManager } from '../services/window-manager.service';
 import { AppContent } from './app-content';
+import { OsNavigator } from './os-navigator.service';
 
 /**
  * Janela do desktop. Fica sempre no DOM (o conteúdo continua indexável) e
@@ -32,7 +33,7 @@ import { AppContent } from './app-content';
     '[style.height.px]': 'state().maximized ? null : app().size.h',
     '[style.transform-origin]': 'state().origin',
     tabindex: '-1',
-    '(pointerdown)': 'wm.focus(app().id)',
+    '(pointerdown)': 'nav.focus(app().id)',
     '(keydown.escape)': 'close()',
   },
   template: `
@@ -42,11 +43,11 @@ import { AppContent } from './app-content';
       (dblclick)="wm.toggleMaximize(app().id)"
     >
       <span class="title" [id]="titleId()">
-        <span aria-hidden="true">[ </span>{{ app().file }}<span aria-hidden="true"> ]</span>
+        <span aria-hidden="true">[ </span>{{ fileName() }}<span aria-hidden="true"> ]</span>
       </span>
       <span class="rule" aria-hidden="true"></span>
       <span class="controls">
-        <button type="button" (click)="wm.minimize(app().id)">
+        <button type="button" (click)="nav.minimize(app().id)">
           <span aria-hidden="true">[_]</span
           ><span class="sr-only">Minimizar {{ app().label }}</span>
         </button>
@@ -71,10 +72,16 @@ export class AppWindow {
   readonly app = input.required<AppIcon>();
 
   protected readonly wm = inject(WindowManager);
+  protected readonly nav = inject(OsNavigator);
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
 
   protected readonly state = computed(() => this.wm.state(this.app().id));
   protected readonly isFocused = computed(() => this.wm.focused() === this.app().id);
+  protected readonly fileName = computed(() => {
+    const app = this.app();
+    const slug = this.wm.projectSlug();
+    return app.id === 'projeto' && slug ? `projetos/${slug}.md` : app.file;
+  });
   protected readonly titleId = computed(() => `win-${this.app().id}-title`);
   protected readonly visualState = computed(() => {
     const state = this.state();
@@ -99,7 +106,7 @@ export class AppWindow {
   }
 
   protected close(): void {
-    this.wm.close(this.app().id);
+    this.nav.close(this.app().id);
     document.querySelector<HTMLElement>(`[data-app-icon="${this.app().id}"] .icon`)?.focus();
   }
 

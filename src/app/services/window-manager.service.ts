@@ -1,5 +1,5 @@
 import { Service, computed, signal } from '@angular/core';
-import { APPS, AppId, appById, isAppId } from '../data/apps';
+import { APPS, AppId, appById } from '../data/apps';
 
 export interface WindowState {
   readonly id: AppId;
@@ -27,9 +27,8 @@ const closedState = (id: AppId, index: number): WindowState => ({
 });
 
 /**
- * Estado das janelas do desktop e do app aberto no celular.
- * No desktop várias janelas convivem; no celular só uma tela fica por cima
- * da home, e ela entra no histórico para o "voltar" do Android funcionar.
+ * Estado das janelas do desktop e do app aberto no celular. Não mexe na
+ * URL: quem liga rota e janela é o OsNavigator.
  */
 @Service()
 export class WindowManager {
@@ -50,8 +49,11 @@ export class WindowManager {
     return visible.reduce((top, win) => (win.z > top.z ? win : top)).id;
   });
 
-  /** App em tela cheia no celular (null = home). */
+  /** App em tela cheia no celular (null = home). Quem define é a rota. */
   readonly phoneApp = signal<AppId | null>(null);
+
+  /** Projeto mostrado na janela/app `projeto` (rota /projetos/:slug). */
+  readonly projectSlug = signal<string | null>(null);
 
   state(id: AppId): WindowState {
     return this.windowMap()[id];
@@ -103,36 +105,6 @@ export class WindowManager {
 
   move(id: AppId, x: number, y: number): void {
     this.patch(id, { x, y });
-  }
-
-  // ── Celular ─────────────────────────────────────────────────────────────
-  openPhoneApp(id: AppId): void {
-    if (this.phoneApp() === id) return;
-    history.pushState({ app: id }, '', `#${id}`);
-    this.phoneApp.set(id);
-  }
-
-  /** Voltar do app (botão do topo ou ◁): usa o histórico para o gesto do sistema funcionar igual. */
-  phoneBack(): void {
-    if (history.state?.app) history.back();
-    else this.closePhoneApp();
-  }
-
-  closePhoneApp(): void {
-    this.phoneApp.set(null);
-    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
-  }
-
-  /** Chamado no `popstate`: o estado do histórico manda no app aberto. */
-  syncFromHistory(): void {
-    const app = (history.state as { app?: string } | null)?.app;
-    this.phoneApp.set(app && isAppId(app) ? app : null);
-  }
-
-  /** Link direto (joaoxavier.dev/#projetos) abre a seção na carga. */
-  appFromHash(): AppId | null {
-    const hash = location.hash.replace('#', '');
-    return isAppId(hash) ? hash : null;
   }
 
   private patch(id: AppId, change: Partial<WindowState>): void {

@@ -6,7 +6,10 @@ Meu site pessoal: links, projetos finalizados do GitHub, experiência e formaç�
 - **Celular:** home no estilo Android com apps em tela cheia, "voltar" no topo e integração com o voltar do sistema. Links diretos como `joaoxavier.dev/#projetos` abrem a seção.
 - **Stack:** Angular 22 (standalone, signals, zoneless), Tailwind 4, [asciify-engine](https://asciify.org) para o papel de parede ASCII e os títulos.
 - **Projetos:** vêm ao vivo da API do GitHub. Aparecem os repositórios com a topic `finalizado`; sem nenhum, uma lista curada; se a API falhar, um snapshot em `src/app/data/repos.fallback.ts`.
-- **Dados:** `src/app/data/profile.data.ts` (textos e links) e `src/app/data/apps.ts` (ícones e janelas).
+- **Páginas reais e pré-renderizadas:** cada seção e cada projeto tem rota própria (`/sobre`, `/projetos/salome`…), gerada no build (Angular SSG) com título, descrição, JSON-LD e `sitemap.xml`. A URL manda nas janelas (`src/app/os/os-navigator.service.ts`).
+- **Projetos:** os curados (Salomé, Claude-Color) ficam em `src/app/data/case-studies.ts`; os demais abrem o README do GitHub.
+- **Terminal:** `/terminal`, com os comandos em `src/app/os/terminal/commands.ts` (puro e testado).
+- **Dados:** `src/app/data/profile.data.ts` (textos e links) e `src/app/data/apps.ts` (ícones, janelas e rotas).
 
 ## Rodar
 

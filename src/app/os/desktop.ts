@@ -10,8 +10,8 @@ import {
 } from '@angular/core';
 import { APPS, AppId, DESKTOP_APPS, DesktopIcon, SHORTCUTS, TRASH } from '../data/apps';
 import { SettingsService } from '../services/settings.service';
-import { WindowManager } from '../services/window-manager.service';
-import { AsciiKit, loadAsciiKit } from '../ui/ascii-kit';
+import { OsNavigator } from './os-navigator.service';
+import { AsciiKit, OFFSCREEN_CLEAR, loadAsciiKit } from '../ui/ascii-kit';
 import { AppWindow } from './app-window';
 import { OsIcon } from './os-icon';
 import { Taskbar } from './taskbar';
@@ -67,9 +67,7 @@ import { Taskbar } from './taskbar';
       isolation: isolate;
       overflow: hidden;
       outline: none;
-      background:
-        radial-gradient(70% 60% at 50% 45%, rgb(92 240 143 / 0.05), transparent 70%),
-        var(--color-ground);
+      background: var(--color-ground);
     }
     :host-context([data-icon-size='s']) .desktop {
       --art: 2.4rem;
@@ -140,7 +138,7 @@ export class Desktop {
   /** A janela de configurações é só do celular; no desktop elas ficam no Iniciar. */
   protected readonly windows = APPS.filter((app) => app.id !== 'config');
 
-  private readonly wm = inject(WindowManager);
+  private readonly navigator = inject(OsNavigator);
   private readonly settings = inject(SettingsService);
   private readonly desktop = viewChild.required<ElementRef<HTMLElement>>('desktop');
 
@@ -148,18 +146,9 @@ export class Desktop {
     const kit = signal<AsciiKit | null>(null);
     let wallpaper: ReturnType<AsciiKit['background']> | null = null;
 
-    const onHash = () => {
-      const linked = this.wm.appFromHash();
-      if (linked) this.wm.open(linked, undefined, this.viewport());
-    };
-    inject(DestroyRef).onDestroy(() => {
-      wallpaper?.destroy();
-      removeEventListener('hashchange', onHash);
-    });
+    inject(DestroyRef).onDestroy(() => wallpaper?.destroy());
 
     afterNextRender(() => {
-      addEventListener('hashchange', onHash);
-      this.wm.open(this.wm.appFromHash() ?? 'sobre', undefined, this.viewport());
       loadAsciiKit()
         .then((loaded) => kit.set(loaded))
         .catch(() => {
@@ -177,7 +166,7 @@ export class Desktop {
         wallpaper = null;
         return;
       }
-      const preset = mode === 'rain' ? asciiKit.cascade : asciiKit.drift;
+      const preset = mode === 'rain' ? asciiKit.cascade : asciiKit.caustics;
       if (wallpaper) {
         wallpaper.setPreset(preset);
         return;
@@ -188,6 +177,9 @@ export class Desktop {
         cellSize: 12,
         speed: 0.6,
         lazy: false,
+        // Sem "meio quieto": sem área livre, o preset apaga o centro e vira uma mancha
+        // escura. Uma área de 1 px fora da tela faz o campo cobrir tudo.
+        clear: OFFSCREEN_CLEAR,
       });
     });
   }
@@ -196,16 +188,18 @@ export class Desktop {
     if (icon.kind !== 'app') return;
     const desktop = this.desktop().nativeElement.getBoundingClientRect();
     const tile = (event.currentTarget as HTMLElement).getBoundingClientRect();
-    this.wm.open(
-      icon.id,
-      { x: tile.left + tile.width / 2 - desktop.left, y: tile.top + tile.height / 2 - desktop.top },
-      this.viewport(),
-    );
+    this.navigator.open(icon.id, {
+      origin: {
+        x: tile.left + tile.width / 2 - desktop.left,
+        y: tile.top + tile.height / 2 - desktop.top,
+      },
+      viewport: this.viewport(),
+    });
   }
 
   protected openFromMenu(id: AppId): void {
     const viewport = this.viewport();
-    this.wm.open(id, { x: 40, y: viewport.h }, viewport);
+    this.navigator.open(id, { origin: { x: 40, y: viewport.h }, viewport });
   }
 
   private viewport(): { w: number; h: number } {
