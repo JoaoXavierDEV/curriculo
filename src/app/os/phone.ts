@@ -9,7 +9,6 @@ import {
   signal,
 } from '@angular/core';
 import { APPS, AppId, DesktopIcon, PHONE_DOCK, PHONE_HOME, PhoneFolder } from '../data/apps';
-import { PROFILE } from '../data/profile.data';
 import { projectMeta } from '../data/projects';
 import { SettingsService } from '../services/settings.service';
 import { WindowManager } from '../services/window-manager.service';
@@ -18,8 +17,9 @@ import { AppContent } from './app-content';
 import { OsIcon } from './os-icon';
 import { SvgIcon } from './svg-icon';
 import { OsNavigator } from './os-navigator.service';
+import { PROFILE } from '../data/profile.data';
 
-/** Recorte padrão quando não há ícone de origem (deep link, busca). */
+/** Recorte padrão quando não há ícone de origem (deep link). */
 const CENTER_INSET = '42% 38% 42% 38%';
 
 function insetFrom(rect: DOMRect): string {
@@ -54,7 +54,6 @@ export class Phone {
     return slug ? projectMeta(slug).name : 'projeto';
   });
   protected readonly clock = signal('--:--');
-  protected readonly date = signal('');
   /**
    * Retângulo do ícone tocado, como recorte `inset()` da tela: o app abre
    * crescendo a partir do ícone e fecha voltando para ele, como no Android.
@@ -63,7 +62,8 @@ export class Phone {
   /** De onde o popup da pasta cresce: o centro do ícone da pasta. */
   protected readonly folderOrigin = signal('50% 50%');
 
-  private lastIcon: AppId | null = null;
+  /** Seletor do elemento que recebe o foco de volta ao fechar o app. */
+  private returnFocus: string | null = null;
 
   constructor() {
     const destroyRef = inject(DestroyRef);
@@ -73,10 +73,8 @@ export class Phone {
       const open = this.wm.phoneApp();
       if (open) {
         document.querySelector<HTMLElement>(`#tela-${open} .back`)?.focus({ preventScroll: true });
-      } else if (this.lastIcon) {
-        document
-          .querySelector<HTMLElement>(`[data-app-icon="${this.lastIcon}"] .icon`)
-          ?.focus({ preventScroll: true });
+      } else if (this.returnFocus) {
+        document.querySelector<HTMLElement>(this.returnFocus)?.focus({ preventScroll: true });
       }
     });
 
@@ -85,9 +83,6 @@ export class Phone {
         const now = new Date();
         const pad = (n: number) => String(n).padStart(2, '0');
         this.clock.set(`${pad(now.getHours())}:${pad(now.getMinutes())}`);
-        this.date.set(
-          now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }),
-        );
       };
       tick();
       const timer = setInterval(tick, 15_000);
@@ -136,8 +131,16 @@ export class Phone {
     const target = event.currentTarget as HTMLElement;
     const art = target.querySelector<HTMLElement>('.art') ?? target;
     this.fromInset.set(insetFrom(art.getBoundingClientRect()));
-    this.lastIcon = icon.id;
+    this.returnFocus = `[data-app-icon="${icon.id}"] .icon`;
     this.nav.open(icon.id);
+  }
+
+  /** Botões do widget de apresentação: abrem o app crescendo a partir do botão. */
+  protected openApp(id: AppId, event: MouseEvent): void {
+    const button = event.currentTarget as HTMLElement;
+    this.fromInset.set(insetFrom(button.getBoundingClientRect()));
+    this.returnFocus = `[data-hero="${id}"]`;
+    this.nav.open(id);
   }
 
   protected openFolder(folder: PhoneFolder, event: MouseEvent): void {
@@ -161,12 +164,6 @@ export class Phone {
   /** Toque no fundo escuro (fora do cartão) fecha a pasta. */
   protected onFolderBackdrop(event: MouseEvent): void {
     if (event.target === event.currentTarget) this.closeFolder();
-  }
-
-  protected openAbout(): void {
-    this.fromInset.set(CENTER_INSET);
-    this.lastIcon = null;
-    this.nav.open('sobre');
   }
 
   protected home(): void {

@@ -10,22 +10,27 @@
   [class.behind]="wm.phoneApp() !== null"
 >
   <div class="wallpaper" aria-hidden="true"></div>
-  <h1 class="sr-only">João Xavier, Dev Full Stack .NET + Angular</h1>
-
-  <section class="widget" aria-label="Resumo">
-    <p class="widget-clock" aria-hidden="true">{{ clock() }}</p>
-    <p class="widget-date">{{ date() }}</p>
+  <section class="hero" aria-labelledby="hero-nome">
+    <div class="hero-head">
+      <span class="hero-avatar" aria-hidden="true">JX</span>
+      <div>
+        <h1 class="hero-name" id="hero-nome">{{ profile.name }}</h1>
+        <p class="hero-role">{{ profile.role }} · RJ</p>
+      </div>
+    </div>
+    <p class="hero-bio">{{ profile.bio }}</p>
+    <div class="hero-actions">
+      <button type="button" class="primary" data-hero="sobre" (click)="openApp('sobre', $event)">
+        Sobre mim
+      </button>
+      <button type="button" data-hero="projetos" (click)="openApp('projetos', $event)">
+        Projetos
+      </button>
+      <button type="button" data-hero="contato" (click)="openApp('contato', $event)">
+        Contato
+      </button>
+    </div>
   </section>
-
-  <button type="button" class="profile-widget" (click)="openAbout()">
-    <span class="profile-avatar" aria-hidden="true">JX</span>
-    <span class="profile-text">
-      <span class="widget-name">{{ profile.name }}</span>
-      <span class="widget-role">{{ profile.role }} · RJ</span>
-    </span>
-    <span class="profile-go" aria-hidden="true">›</span>
-    <span class="sr-only">: abrir sobre mim</span>
-  </button>
 
   <nav class="apps" aria-label="Apps">
     <ul class="grid">
