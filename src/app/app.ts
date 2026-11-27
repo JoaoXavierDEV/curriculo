@@ -1,5 +1,6 @@
 import { Component, DestroyRef, afterNextRender, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { BootScreen } from './os/boot-screen';
 import { Desktop } from './os/desktop';
 import { OsNavigator } from './os/os-navigator.service';
 import { Phone } from './os/phone';
@@ -14,7 +15,7 @@ const PHONE_QUERY = '(max-width: 767px)';
  */
 @Component({
   selector: 'app-root',
-  imports: [Desktop, Phone, RouterOutlet],
+  imports: [BootScreen, Desktop, Phone, RouterOutlet],
   template: `
     <router-outlet />
     @if (isPhone()) {
@@ -22,10 +23,15 @@ const PHONE_QUERY = '(max-width: 767px)';
     } @else {
       <app-desktop />
     }
+    @if (booting()) {
+      <app-boot-screen (done)="booting.set(false)" />
+    }
   `,
 })
 export class App {
   protected readonly isPhone = signal(false);
+  /** Tela de boot por cima de tudo até terminar (ou ser pulada). */
+  protected readonly booting = signal(true);
   private readonly navigator = inject(OsNavigator);
 
   constructor() {

@@ -158,3 +158,9 @@
     transform: none;
   }
 }
+
+
+/* Dock: nome pequeno embaixo do ícone. */
+:host(.dock-icon) .label {
+  font-size: 0.64rem;
+}

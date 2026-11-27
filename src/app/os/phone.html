@@ -3,27 +3,52 @@
   <span class="status-icons">▂▄▆█ 5G <span class="battery">[▮▮▮▯]</span> 87%</span>
 </div>
 
-<main class="home" id="conteudo" [inert]="wm.phoneApp() !== null">
+<main
+  class="home"
+  id="conteudo"
+  [inert]="wm.phoneApp() !== null"
+  [class.behind]="wm.phoneApp() !== null"
+>
   <div class="wallpaper" aria-hidden="true"></div>
   <h1 class="sr-only">João Xavier, Dev Full Stack .NET + Angular</h1>
 
   <section class="widget" aria-label="Resumo">
     <p class="widget-clock" aria-hidden="true">{{ clock() }}</p>
     <p class="widget-date">{{ date() }}</p>
-    <p class="widget-name">{{ profile.name }}</p>
-    <p class="widget-role">{{ profile.role }} · RJ</p>
-    <button type="button" class="search" (click)="openAbout()">
-      <span class="text-phosphor" aria-hidden="true">$</span> whoami
-      <span class="search-cursor" aria-hidden="true"></span>
-      <span class="sr-only">: abrir sobre mim</span>
-    </button>
   </section>
 
+  <button type="button" class="profile-widget" (click)="openAbout()">
+    <span class="profile-avatar" aria-hidden="true">JX</span>
+    <span class="profile-text">
+      <span class="widget-name">{{ profile.name }}</span>
+      <span class="widget-role">{{ profile.role }} · RJ</span>
+    </span>
+    <span class="profile-go" aria-hidden="true">›</span>
+    <span class="sr-only">: abrir sobre mim</span>
+  </button>
+
   <nav class="apps" aria-label="Apps">
-    <ul>
-      @for (icon of icons; track icon.id) {
-        <li [attr.data-app-icon]="icon.id">
-          <app-os-icon class="phone" [icon]="icon" (opened)="open(icon, $event)" />
+    <ul class="grid">
+      @for (item of homeItems; track item.id) {
+        <li [attr.data-app-icon]="item.id">
+          @if (item.kind === 'folder') {
+            <button
+              type="button"
+              class="folder"
+              [attr.data-folder]="item.id"
+              aria-haspopup="dialog"
+              (click)="openFolder(item, $event)"
+            >
+              <span class="folder-art" aria-hidden="true">
+                @for (inner of item.icons; track inner.id) {
+                  <app-svg-icon [name]="inner.icon" />
+                }
+              </span>
+              <span class="folder-label">{{ item.label }}</span>
+            </button>
+          } @else {
+            <app-os-icon class="phone" [icon]="item" (opened)="open(item, $event)" />
+          }
         </li>
       }
     </ul>
@@ -38,7 +63,7 @@
     [attr.aria-labelledby]="'tela-' + app.id + '-title'"
     [attr.data-state]="wm.phoneApp() === app.id ? 'open' : 'closed'"
     [inert]="wm.phoneApp() !== app.id"
-    [style.transform-origin]="origin()"
+    [style.--from]="fromInset()"
   >
     <header class="appbar">
       <button type="button" class="back" (click)="nav.back()">
@@ -54,6 +79,38 @@
     </div>
   </section>
 }
+
+<nav
+  class="dock"
+  aria-label="Favoritos"
+  [class.hidden]="wm.phoneApp() !== null"
+  [inert]="wm.phoneApp() !== null"
+>
+  <ul>
+    @for (icon of dock; track icon.id) {
+      <li [attr.data-app-icon]="icon.id">
+        <app-os-icon class="phone dock-icon" [icon]="icon" (opened)="open(icon, $event)" />
+      </li>
+    }
+  </ul>
+</nav>
+
+<dialog
+  class="folder-popup"
+  aria-labelledby="pasta-titulo"
+  [style.--folder-origin]="folderOrigin()"
+  (close)="onFolderClosed()"
+  (click)="onFolderBackdrop($event)"
+>
+  <div class="folder-card">
+    <h2 class="folder-title" id="pasta-titulo">{{ folder()?.label }}</h2>
+    <ul class="grid grid-2">
+      @for (icon of folder()?.icons ?? []; track icon.id) {
+        <li><app-os-icon class="phone" [icon]="icon" /></li>
+      }
+    </ul>
+  </div>
+</dialog>
 
 <nav class="navbar" aria-label="Navegação do sistema">
   <button

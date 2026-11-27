@@ -204,10 +204,41 @@ export const DESKTOP_APPS: readonly AppIcon[] = [
 ].map((id) => app(id as AppId));
 export const TRASH: AppIcon = app('lixeira');
 
-/** Home do celular: seções, atalhos e, no fim, configurações e lixeira. */
-export const PHONE_ICONS: readonly DesktopIcon[] = [
-  ...DESKTOP_APPS,
-  ...SHORTCUTS,
+/** Dock do celular: as seções principais do currículo, sempre à mão. */
+export const PHONE_DOCK: readonly AppIcon[] = ['sobre', 'projetos', 'carreira', 'contato'].map(
+  (id) => app(id as AppId),
+);
+
+/** Pasta da home do celular: um ícone que abre um popup com outros ícones. */
+export interface PhoneFolder {
+  readonly kind: 'folder';
+  readonly id: string;
+  readonly label: string;
+  readonly icons: readonly LinkIcon[];
+}
+
+export type PhoneItem = DesktopIcon | PhoneFolder;
+
+/** Home do celular: apps, GitHub, pasta de redes sociais e demais atalhos. */
+export const PHONE_HOME: readonly PhoneItem[] = [
+  app('terminal'),
+  app('formacao'),
+  link('github', LINKS.github),
+  {
+    kind: 'folder',
+    id: 'redes',
+    label: 'Redes sociais',
+    icons: [
+      link('linkedin', LINKS.linkedin),
+      link('email', LINKS.email),
+      link('youtube', LINKS.youtube),
+      link('twitch', LINKS.twitch),
+    ],
+  },
+  link('whatsapp', LINKS.whatsapp),
+  link('instagram', LINKS.instagram),
+  link('heavycode', LINKS.heavycode),
+  link('salome', LINKS.salome),
   app('config'),
   TRASH,
 ];

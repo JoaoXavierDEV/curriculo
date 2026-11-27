@@ -8,7 +8,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { APPS, AppId, DesktopIcon, PHONE_ICONS } from '../data/apps';
+import { APPS, AppId, DesktopIcon, PHONE_DOCK, PHONE_HOME, PhoneFolder } from '../data/apps';
 import { PROFILE } from '../data/profile.data';
 import { projectMeta } from '../data/projects';
 import { SettingsService } from '../services/settings.service';
@@ -16,7 +16,17 @@ import { WindowManager } from '../services/window-manager.service';
 import { AsciiKit, OFFSCREEN_CLEAR, loadAsciiKit } from '../ui/ascii-kit';
 import { AppContent } from './app-content';
 import { OsIcon } from './os-icon';
+import { SvgIcon } from './svg-icon';
 import { OsNavigator } from './os-navigator.service';
+
+/** Recorte padrão quando não há ícone de origem (deep link, busca). */
+const CENTER_INSET = '42% 38% 42% 38%';
+
+function insetFrom(rect: DOMRect): string {
+  const right = innerWidth - rect.right;
+  const bottom = innerHeight - rect.bottom;
+  return `${rect.top}px ${right}px ${bottom}px ${rect.left}px`;
+}
 
 /**
  * Celular: uma home no estilo Android. Os ícones de seção abrem "apps" em
@@ -25,14 +35,17 @@ import { OsNavigator } from './os-navigator.service';
  */
 @Component({
   selector: 'app-phone',
-  imports: [OsIcon, AppContent],
+  imports: [OsIcon, SvgIcon, AppContent],
   templateUrl: './phone.html',
   styleUrl: './phone.css',
 })
 export class Phone {
   protected readonly wm = inject(WindowManager);
   protected readonly nav = inject(OsNavigator);
-  protected readonly icons = PHONE_ICONS;
+  protected readonly homeItems = PHONE_HOME;
+  /** Pasta aberta no popup (null = fechada). */
+  protected readonly folder = signal<PhoneFolder | null>(null);
+  protected readonly dock = PHONE_DOCK;
   protected readonly apps = APPS;
   protected readonly profile = PROFILE;
 
@@ -42,8 +55,13 @@ export class Phone {
   });
   protected readonly clock = signal('--:--');
   protected readonly date = signal('');
-  /** De onde cada app "cresce" ao abrir: o centro do ícone tocado. */
-  protected readonly origin = signal('50% 50%');
+  /**
+   * Retângulo do ícone tocado, como recorte `inset()` da tela: o app abre
+   * crescendo a partir do ícone e fecha voltando para ele, como no Android.
+   */
+  protected readonly fromInset = signal(CENTER_INSET);
+  /** De onde o popup da pasta cresce: o centro do ícone da pasta. */
+  protected readonly folderOrigin = signal('50% 50%');
 
   private lastIcon: AppId | null = null;
 
@@ -115,14 +133,38 @@ export class Phone {
 
   protected open(icon: DesktopIcon, event: MouseEvent): void {
     if (icon.kind !== 'app') return;
-    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-    this.origin.set(`${rect.left + rect.width / 2}px ${rect.top + rect.height / 2}px`);
+    const target = event.currentTarget as HTMLElement;
+    const art = target.querySelector<HTMLElement>('.art') ?? target;
+    this.fromInset.set(insetFrom(art.getBoundingClientRect()));
     this.lastIcon = icon.id;
     this.nav.open(icon.id);
   }
 
+  protected openFolder(folder: PhoneFolder, event: MouseEvent): void {
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    this.folderOrigin.set(`${rect.left + rect.width / 2}px ${rect.top + rect.height / 2}px`);
+    this.folder.set(folder);
+    document.querySelector<HTMLDialogElement>('app-phone .folder-popup')?.showModal();
+  }
+
+  protected closeFolder(): void {
+    document.querySelector<HTMLDialogElement>('app-phone .folder-popup')?.close();
+  }
+
+  /** O <dialog> fechou (Esc, toque fora): devolve o foco ao ícone da pasta. */
+  protected onFolderClosed(): void {
+    const id = this.folder()?.id;
+    this.folder.set(null);
+    document.querySelector<HTMLElement>(`[data-folder="${id}"]`)?.focus({ preventScroll: true });
+  }
+
+  /** Toque no fundo escuro (fora do cartão) fecha a pasta. */
+  protected onFolderBackdrop(event: MouseEvent): void {
+    if (event.target === event.currentTarget) this.closeFolder();
+  }
+
   protected openAbout(): void {
-    this.origin.set('50% 20%');
+    this.fromInset.set(CENTER_INSET);
     this.lastIcon = null;
     this.nav.open('sobre');
   }
