@@ -50,9 +50,9 @@ const WHATSAPP_TEXT = 'Oi, João! Vim pelo joaoxavier.dev';
 export const PROFILE = {
   name: 'João Xavier',
   fullName: 'João Fernando Xavier',
-  role: 'Dev Full Stack .NET + Angular',
+  role: 'Engenheiro de Software  ' + '\n '+' #dotNET #Azure #IA',
   location: 'Rio de Janeiro, Brasil',
-  bio: 'Escrevo C# de dia, Angular de tarde e às vezes coisas estranhas de madrugada, tipo fazer as luzes RGB do PC reagirem ao Claude Code. Pós-graduado em Engenharia de Software pela PUC-Rio.',
+  bio: 'Construo sistemas de ponta a ponta com .NET e Azure no back-end, Angular na web e Flutter no mobile, com o Claude Code no fluxo do dia a dia para entregar mais rápido sem abrir mão de revisão e testes. Pós-graduado em Engenharia de Software pela PUC-Rio.',
   stack: [
     'C#',
     '.NET',

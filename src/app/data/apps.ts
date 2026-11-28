@@ -58,12 +58,12 @@ export const APPS: readonly AppIcon[] = [
     icon: 'document',
     label: 'sobre.txt',
     file: 'sobre.txt',
-    size: { w: 1251, h: 734 },
+    size: { w: 1251, h: 820 },
     route: 'sobre',
     seo: {
       title: 'Sobre mim',
       description:
-        'Quem é o João Xavier: dev full stack .NET + Angular no Rio de Janeiro, pós-graduado em Engenharia de Software pela PUC-Rio.',
+        'Quem é o João Xavier: engenheiro de software .NET, Angular e IA no Rio de Janeiro, pós-graduado em Engenharia de Software pela PUC-Rio.',
     },
     center: true,
   },

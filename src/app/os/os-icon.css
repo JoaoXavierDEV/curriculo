@@ -124,7 +124,7 @@
 
 /* ── Celular: ícone de launcher, todos em quadrado arredondado ──────────── */
 :host(.phone) {
-  --art: 3.4rem;
+  --art: var(--phone-art, 3.4rem);
 }
 
 :host(.phone) .icon {

@@ -63,7 +63,7 @@ export const BOOT_LINES: readonly BootLine[] = [
   { text: '' },
   { text: 'joaoxavier.dev login: joao' },
   { text: 'Last login: hoje, de algum lugar da internet' },
-  { text: 'Bem-vindo ao joaoxavier.dev · Dev Full Stack .NET + Angular', status: 'info' },
+  { text: 'Bem-vindo ao joaoxavier.dev · Engenheiro de Software · .NET, Angular e IA', status: 'info' },
 ];
 
 /** Atraso (ms) de cada linha: começa rápido e desacelera, como um kernel de verdade. */

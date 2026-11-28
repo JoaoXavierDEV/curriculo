@@ -21,7 +21,7 @@ import { Taskbar } from './taskbar';
   imports: [OsIcon, AppWindow, Taskbar],
   template: `
     <main class="desktop" #desktop id="conteudo">
-      <h1 class="sr-only">João Xavier, Dev Full Stack .NET + Angular</h1>
+      <h1 class="sr-only">João Xavier, Engenheiro de Software · .NET, Angular e IA</h1>
 
       <nav class="icons apps" aria-label="Área de trabalho">
         <ul>

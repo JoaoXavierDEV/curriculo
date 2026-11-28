@@ -10,7 +10,7 @@ const SITE = 'https://joaoxavier.dev';
 const SITE_NAME = 'João Xavier';
 const HOME_TITLE = 'João Xavier · dev .NET + Angular';
 const HOME_DESCRIPTION =
-  'João Xavier, dev full stack .NET + Angular no Rio de Janeiro. Projetos, experiência, formação e todos os meus links num lugar só.';
+  'João Xavier, engenheiro de software .NET, Angular e IA no Rio de Janeiro. Projetos, experiência, formação e todos os meus links num lugar só.';
 const TASKBAR_PX = 36;
 
 export type OsMode = 'desktop' | 'phone';
