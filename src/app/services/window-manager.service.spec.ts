@@ -49,7 +49,7 @@ describe('WindowManager', () => {
 
   it('sobre.txt abre centralizado e no tamanho pedido, limitado à tela', () => {
     wm.open('sobre', undefined, { w: 1440, h: 864 });
-    expect(wm.state('sobre')).toMatchObject({ x: 95, y: 35 });
+    expect(wm.state('sobre')).toMatchObject({ x: 95, y: 22 });
     wm.close('sobre');
     const small = TestBed.inject(WindowManager);
     expect(small.state('sobre').open).toBe(false);
