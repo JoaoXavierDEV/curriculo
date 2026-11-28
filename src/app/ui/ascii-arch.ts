@@ -54,6 +54,8 @@ const node = (id: string, x: number, y: number, w: number, title: string, sub: s
 
     canvas {
       display: block;
+      max-width: 100%;
+      height: auto;
       border: 1px solid var(--color-line-strong);
       border-radius: 6px;
       background: #050706;
@@ -90,7 +92,8 @@ export class AsciiArch {
       const height = ROWS * ch + pad * 2;
       const dpr = Math.min(devicePixelRatio || 1, 2);
       canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
+      // Em telas estreitas (celular) o canvas encolhe mantendo a proporção.
+      canvas.style.aspectRatio = `${width} / ${height}`;
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       ctx.scale(dpr, dpr);

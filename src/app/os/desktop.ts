@@ -21,7 +21,7 @@ import { Taskbar } from './taskbar';
   imports: [OsIcon, AppWindow, Taskbar],
   template: `
     <main class="desktop" #desktop id="conteudo">
-      <h1 class="sr-only">João Xavier, Engenheiro de Software · .NET, Angular e IA</h1>
+      <h1 class="sr-only">{{ navigator.heading() }}</h1>
 
       <nav class="icons apps" aria-label="Área de trabalho">
         <ul>
@@ -138,7 +138,7 @@ export class Desktop {
   /** A janela de configurações é só do celular; no desktop elas ficam no Iniciar. */
   protected readonly windows = APPS.filter((app) => app.id !== 'config');
 
-  private readonly navigator = inject(OsNavigator);
+  protected readonly navigator = inject(OsNavigator);
   private readonly settings = inject(SettingsService);
   private readonly desktop = viewChild.required<ElementRef<HTMLElement>>('desktop');
 

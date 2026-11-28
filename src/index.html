@@ -2,7 +2,7 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
-    <title>João Xavier · dev .NET + Angular</title>
+    <title>João Xavier · Engenheiro de Software .NET, Angular e IA</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta
@@ -16,7 +16,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="pt_BR" />
     <meta property="og:url" content="https://joaoxavier.dev/" />
-    <meta property="og:title" content="João Xavier · dev .NET + Angular" />
+    <meta property="og:title" content="João Xavier · Engenheiro de Software .NET, Angular e IA" />
     <meta
       property="og:description"
       content="Projetos, experiência, formação e todos os meus links num lugar só."
@@ -26,8 +26,10 @@
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
 
+    <link rel="icon" href="favicon.ico" sizes="48x48" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="manifest" href="site.webmanifest" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -39,47 +41,81 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "João Xavier",
-        "alternateName": "João Fernando Xavier",
-        "url": "https://joaoxavier.dev/",
-        "image": "https://joaoxavier.dev/og.png",
-        "jobTitle": "Desenvolvedor de Software Pleno",
-        "description": "Engenheiro de software .NET, Angular e IA no Rio de Janeiro.",
-        "email": "mailto:contato@joaoxavier.dev",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Rio de Janeiro",
-          "addressCountry": "BR"
-        },
-        "worksFor": { "@type": "Organization", "name": "NST E-Business" },
-        "alumniOf": [
+        "@graph": [
           {
-            "@type": "CollegeOrUniversity",
-            "name": "Pontifícia Universidade Católica do Rio de Janeiro"
+            "@type": "WebSite",
+            "@id": "https://joaoxavier.dev/#website",
+            "url": "https://joaoxavier.dev/",
+            "name": "João Xavier",
+            "inLanguage": "pt-BR",
+            "publisher": { "@id": "https://joaoxavier.dev/#person" }
           },
-          { "@type": "CollegeOrUniversity", "name": "Estácio" },
-          { "@type": "EducationalOrganization", "name": "Senac RJ" }
-        ],
-        "knowsAbout": [
-          "C#",
-          ".NET",
-          "ASP.NET Core",
-          "Angular",
-          "TypeScript",
-          "Azure",
-          "SQL Server",
-          "PostgreSQL",
-          "Flutter",
-          "Claude Code"
-        ],
-        "sameAs": [
-          "https://github.com/JoaoXavierDEV",
-          "https://www.linkedin.com/in/joaoxavierdev/",
-          "https://www.instagram.com/joaoxavier.dev/",
-          "https://www.youtube.com/channel/UCmuDm5HN4u2LjsbIZ0Tbikw",
-          "https://www.twitch.tv/joaoxavierdev",
-          "https://heavycode.com.br/"
+          {
+            "@type": "ProfilePage",
+            "@id": "https://joaoxavier.dev/#profile",
+            "url": "https://joaoxavier.dev/",
+            "name": "João Xavier · Engenheiro de Software .NET, Angular e IA",
+            "inLanguage": "pt-BR",
+            "isPartOf": { "@id": "https://joaoxavier.dev/#website" },
+            "mainEntity": { "@id": "https://joaoxavier.dev/#person" }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://joaoxavier.dev/#person",
+            "name": "João Xavier",
+            "alternateName": "João Fernando Xavier",
+            "url": "https://joaoxavier.dev/",
+            "image": "https://joaoxavier.dev/og.png",
+            "jobTitle": "Engenheiro de Software",
+            "description": "Engenheiro de software full stack no Rio de Janeiro: C#/.NET e Azure no back-end, Angular na web e Flutter no mobile.",
+            "email": "mailto:contato@joaoxavier.dev",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Rio de Janeiro",
+              "addressRegion": "RJ",
+              "addressCountry": "BR"
+            },
+            "worksFor": { "@type": "Organization", "name": "NST E-Business" },
+            "hasOccupation": {
+              "@type": "Occupation",
+              "name": "Desenvolvedor de Software Pleno",
+              "occupationLocation": { "@type": "Country", "name": "Brasil" }
+            },
+            "alumniOf": [
+              {
+                "@type": "CollegeOrUniversity",
+                "name": "Pontifícia Universidade Católica do Rio de Janeiro"
+              },
+              { "@type": "CollegeOrUniversity", "name": "Estácio" },
+              { "@type": "EducationalOrganization", "name": "Senac RJ" }
+            ],
+            "knowsAbout": [
+              "C#",
+              ".NET",
+              "ASP.NET Core",
+              "Angular",
+              "TypeScript",
+              "Azure",
+              "SQL Server",
+              "PostgreSQL",
+              "Flutter",
+              "Claude Code"
+            ],
+            "sameAs": [
+              "https://github.com/JoaoXavierDEV",
+              "https://www.linkedin.com/in/joaoxavierdev/",
+              "https://www.instagram.com/joaoxavier.dev/",
+              "https://www.youtube.com/channel/UCmuDm5HN4u2LjsbIZ0Tbikw",
+              "https://www.twitch.tv/joaoxavierdev"
+            ]
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://heavycode.com.br/#org",
+            "name": "Heavy Code",
+            "url": "https://heavycode.com.br/",
+            "founder": { "@id": "https://joaoxavier.dev/#person" }
+          }
         ]
       }
     </script>

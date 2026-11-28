@@ -75,9 +75,10 @@ import { TypeOnViewDirective } from '../ui/type-on-view.directive';
       display: block;
       container-type: inline-size;
     }
-    /* Gato à direita só quando a janela tem espaço (desktop largo). */
+    /* Mapa de arquitetura: abaixo do texto em telas estreitas, à direita quando há espaço. */
     .about-cat {
-      display: none;
+      display: block;
+      margin-top: 2rem;
     }
     @container (min-width: 900px) {
       .about-layout {
@@ -87,9 +88,9 @@ import { TypeOnViewDirective } from '../ui/type-on-view.directive';
         align-items: start;
       }
       .about-cat {
-        display: block;
         position: sticky;
         top: 1rem;
+        margin-top: 0;
       }
     }
     .about-name {

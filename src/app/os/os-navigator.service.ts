@@ -8,7 +8,8 @@ import { WindowManager } from '../services/window-manager.service';
 
 const SITE = 'https://joaoxavier.dev';
 const SITE_NAME = 'João Xavier';
-const HOME_TITLE = 'João Xavier · dev .NET + Angular';
+const HOME_TITLE = 'João Xavier · Engenheiro de Software .NET, Angular e IA';
+const HOME_HEADING = 'João Xavier, Engenheiro de Software · .NET, Angular e IA';
 const HOME_DESCRIPTION =
   'João Xavier, engenheiro de software .NET, Angular e IA no Rio de Janeiro. Projetos, experiência, formação e todos os meus links num lugar só.';
 const TASKBAR_PX = 36;
@@ -41,6 +42,8 @@ export class OsNavigator {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   readonly mode = signal<OsMode>('desktop');
+  /** H1 da página atual: muda com a rota, para cada página ter o seu. */
+  readonly heading = signal(HOME_HEADING);
 
   /** Quantas entradas do histórico foram empilhadas dentro do site (decide o "voltar"). */
   private depth = 0;
@@ -154,21 +157,25 @@ export class OsNavigator {
 
   private updateSeo(app: AppId | null, slug: string | null): void {
     let title = HOME_TITLE;
+    let heading = HOME_HEADING;
     let description = HOME_DESCRIPTION;
     let image = `${SITE}/og.png`;
     if (app === 'projeto' && slug) {
       const project = projectMeta(slug);
       title = `${project.name} · ${SITE_NAME}`;
+      heading = `${project.name}, projeto de João Xavier`;
       description = project.description;
       if (project.image) image = `${SITE}${project.image}`;
     } else if (app) {
       const seo = appById(app).seo;
       title = `${seo.title} · ${SITE_NAME}`;
+      heading = `${seo.title} · João Xavier, Engenheiro de Software`;
       description = seo.description;
     }
     const url = `${SITE}${app ? this.path(app, slug) : '/'}`;
 
     this.title.setTitle(title);
+    this.heading.set(heading);
     this.meta.updateTag({ name: 'description', content: description });
     this.meta.updateTag({ property: 'og:title', content: title });
     this.meta.updateTag({ property: 'og:description', content: description });

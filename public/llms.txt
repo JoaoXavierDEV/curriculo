@@ -1,0 +1,28 @@
+# João Xavier
+
+> João Fernando Xavier (João Xavier) é engenheiro de software full stack no Rio de Janeiro, Brasil. Trabalha com C#/.NET e Azure no back-end, Angular na web e Flutter no mobile, usando o Claude Code no dia a dia. Pós-graduado em Engenharia de Software pela PUC-Rio. Atua remoto.
+
+## Fatos
+
+- Cargo atual: Desenvolvedor de Software Pleno na NST E-Business (desde ago 2025, remoto)
+- Antes: CMCorp, de estagiário de desenvolvimento C# (dez 2021) a desenvolvedor .NET júnior (até mai 2025)
+- Formação: Pós-graduação em Engenharia de Software (PUC-Rio, 2025–2026); Bacharelado em Sistemas de Informação (Estácio, 2019–2023); Técnico em Informática (Senac RJ, 2018–2019)
+- Stack: C#, .NET, ASP.NET Core, EF Core, Angular, TypeScript, SQL Server, PostgreSQL, Python, Azure, Flutter
+- Empresa própria: Heavy Code (https://heavycode.com.br/), software sob medida, integrações e consultoria
+- Produto: Salomé (https://espacosalome.com.br/), SaaS multi-tenant para salões e barbearias (.NET 10, Angular, Flutter, Azure Functions, PostgreSQL)
+- Contato: contato@joaoxavier.dev
+
+## Páginas
+
+- [Sobre mim](https://joaoxavier.dev/sobre): quem é, stack e o que faz hoje
+- [Experiência](https://joaoxavier.dev/carreira): histórico profissional
+- [Formação](https://joaoxavier.dev/formacao): formação acadêmica
+- [Projetos](https://joaoxavier.dev/projetos): projetos finalizados, com estudos de caso
+- [Salomé](https://joaoxavier.dev/projetos/salome): estudo de caso do Salomé
+- [Contato](https://joaoxavier.dev/contato): e-mail e WhatsApp
+
+## Perfis
+
+- [GitHub](https://github.com/JoaoXavierDEV)
+- [LinkedIn](https://www.linkedin.com/in/joaoxavierdev/)
+- [YouTube](https://www.youtube.com/channel/UCmuDm5HN4u2LjsbIZ0Tbikw)
