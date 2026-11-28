@@ -1,10 +1,4 @@
 {
-  "navigationFallback": {
-    "rewrite": "/index.csr.html",
-    "exclude": [
-      "/*.{png,jpg,jpeg,gif,svg,ico,webp,js,css,json,txt,xml,woff,woff2,webmanifest,md}"
-    ]
-  },
   "routes": [
     {
       "route": "/*.{js,css}",
@@ -30,5 +24,11 @@
     ".json": "application/json",
     ".webmanifest": "application/manifest+json",
     ".txt": "text/plain; charset=utf-8"
+  },
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/404.html",
+      "statusCode": 404
+    }
   }
 }
